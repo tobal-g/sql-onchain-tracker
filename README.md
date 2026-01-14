@@ -1,98 +1,387 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# w3g-onchain-service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A blockchain portfolio management REST API built with NestJS that provides comprehensive wallet analytics and portfolio tracking across multiple blockchain networks. It aggregates data from the Zapper Protocol via GraphQL to deliver real-time information about token balances, DeFi positions, NFT holdings, claimable rewards, and portfolio totals.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Purpose
 
-## Description
+This service enables Web3 applications to display detailed wallet portfolio information through a clean REST API interface. It acts as a middleware between your application and the Zapper GraphQL API, providing:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Cached responses (90-second TTL) to reduce external API calls
+- Type-safe DTOs with validation
+- Simplified REST endpoints instead of raw GraphQL queries
+- Aggregated portfolio views across multiple chains
 
-## Project setup
+## Technologies
 
-```bash
-$ yarn install
+- **NestJS 11** - Progressive Node.js framework
+- **TypeScript 5.7** - Type-safe development
+- **Axios** - HTTP client for GraphQL requests
+- **Swagger/OpenAPI** - API documentation
+- **cache-manager** - In-memory response caching
+- **class-validator** - DTO validation
+
+## Project Structure
+
+```
+src/
+├── main.ts                         # Application entry point (PORT config)
+├── app.module.ts                   # Root module
+├── app.controller.ts               # Health check endpoint (GET /)
+├── app.service.ts                  # Basic service
+└── portfolio/
+    ├── portfolio.module.ts         # Portfolio feature module (caching config)
+    ├── portfolio.controller.ts     # 7 API endpoints
+    ├── portfolio.service.ts        # GraphQL queries to Zapper
+    └── dto/
+        └── portfolio.dto.ts        # 20+ Data Transfer Objects
 ```
 
-## Compile and run the project
+## Installation
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+yarn install
 ```
 
-## Run tests
+## Configuration
+
+Create a `.env` file in the project root:
+
+```env
+# Required
+ZAPPER_API_KEY=your_zapper_api_key
+
+# Optional
+PORT=3000
+ZAPPER_API_URL=https://public.zapper.xyz/graphql
+CACHE_TTL=90
+```
+
+## Running the Service
 
 ```bash
-# unit tests
-$ yarn run test
+# Development (watch mode)
+yarn start:dev
 
-# e2e tests
-$ yarn run test:e2e
+# Production
+yarn build
+yarn start:prod
 
-# test coverage
-$ yarn run test:cov
+# Debug mode
+yarn start:debug
 ```
 
-## Deployment
+The server runs on `http://localhost:3000` by default.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## API Endpoints
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+All portfolio endpoints accept an Ethereum wallet address (`0x...`) as a URL parameter.
+
+### Common Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `chainIds` | number[] | Filter by chain IDs (e.g., 1=Ethereum, 8453=Base, 137=Polygon) |
+| `first` | number | Pagination limit |
+| `minBalanceUSD` | number | Minimum USD balance filter |
+
+### Endpoints
+
+#### Health Check
+```
+GET /
+```
+Returns "Hello World!" for liveness checks.
+
+#### Token Balances
+```
+GET /portfolio/:address/tokens
+```
+Returns token balances across networks.
+
+**Response structure:**
+```json
+{
+  "totalBalanceUSD": 251379.08,
+  "totalCount": 6443,
+  "byToken": [
+    {
+      "symbol": "ETH",
+      "tokenAddress": "0x...",
+      "balance": 10.5,
+      "balanceUSD": 31298.93,
+      "price": 2980.85,
+      "name": "Ethereum",
+      "network": { "name": "Base", "chainId": 8453 }
+    }
+  ]
+}
+```
+
+#### DeFi App Positions
+```
+GET /portfolio/:address/apps
+```
+Returns DeFi application positions (lending, staking, liquidity pools, etc.).
+
+**Response structure:**
+```json
+{
+  "totalBalanceUSD": 4410.54,
+  "apps": [
+    {
+      "appId": "aave-v3",
+      "appName": "Aave V3",
+      "network": { "name": "Ethereum", "chainId": 1 },
+      "category": "Lending",
+      "balanceUSD": 1500.00,
+      "positions": [...]
+    }
+  ]
+}
+```
+
+#### NFT Holdings
+```
+GET /portfolio/:address/nfts
+```
+Returns NFT holdings with metadata and estimated valuations.
+
+**Response structure:**
+```json
+{
+  "totalBalanceUSD": 62906.44,
+  "totalCount": 150,
+  "nfts": [
+    {
+      "tokenId": "1234",
+      "name": "Cool NFT #1234",
+      "collection": { "name": "Cool Collection", "address": "0x..." },
+      "estimatedValueUSD": 5000.00,
+      "network": { "name": "Ethereum", "chainId": 1 },
+      "media": { "image": "https://..." }
+    }
+  ]
+}
+```
+
+#### Portfolio Totals
+```
+GET /portfolio/:address/totals
+```
+Returns aggregated portfolio values across all asset types.
+
+**Response structure:**
+```json
+{
+  "tokenBalances": {
+    "totalBalanceUSD": 225590.10,
+    "byNetwork": [
+      { "network": { "name": "Base", "chainId": 8453 }, "balanceUSD": 221754.19 }
+    ]
+  },
+  "appBalances": { "totalBalanceUSD": 4410.54 },
+  "nftBalances": { "totalBalanceUSD": 62906.44 },
+  "totalPortfolioValue": 292907.08
+}
+```
+
+#### Claimable Tokens
+```
+GET /portfolio/:address/claimables
+```
+Returns tokens available to claim (rewards, airdrops, incentives).
+
+**Response structure:**
+```json
+{
+  "totalClaimableUSD": 150.25,
+  "claimables": [
+    {
+      "appId": "uniswap",
+      "appName": "Uniswap",
+      "token": { "symbol": "UNI", "amount": 10.5, "valueUSD": 75.00 },
+      "network": { "name": "Ethereum", "chainId": 1 }
+    }
+  ]
+}
+```
+
+#### Position Breakdown
+```
+GET /portfolio/:address/breakdown
+```
+Returns breakdown by position types (SUPPLIED, BORROWED, CLAIMABLE, LOCKED, VESTING).
+
+**Response structure:**
+```json
+{
+  "breakdowns": [
+    { "type": "SUPPLIED", "count": 5, "balanceUSD": 10000.00 },
+    { "type": "BORROWED", "count": 2, "balanceUSD": 3000.00 },
+    { "type": "CLAIMABLE", "count": 3, "balanceUSD": 150.25 }
+  ]
+}
+```
+
+#### Complete Portfolio
+```
+GET /portfolio/:address
+```
+Returns complete portfolio overview (all data above in a single response). Executes all queries in parallel for optimal performance.
+
+**Response structure:**
+```json
+{
+  "tokens": { ... },
+  "apps": { ... },
+  "nfts": { ... },
+  "totals": { ... },
+  "claimables": { ... },
+  "breakdown": { ... }
+}
+```
+
+## Integration Examples
+
+### cURL
 
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+# Get token balances on Base chain
+curl "http://localhost:3000/portfolio/0x849151d7d0bf1f34b70d5cad5149d28cc2308bf1/tokens?chainIds=8453&first=10"
+
+# Get complete portfolio
+curl "http://localhost:3000/portfolio/0x849151d7d0bf1f34b70d5cad5149d28cc2308bf1"
+
+# Get NFTs with minimum $1000 value
+curl "http://localhost:3000/portfolio/0x849151d7d0bf1f34b70d5cad5149d28cc2308bf1/nfts?minBalanceUSD=1000"
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### JavaScript/TypeScript
 
-## Resources
+```typescript
+const axios = require('axios');
 
-Check out a few resources that may come in handy when working with NestJS:
+const API_BASE = 'http://localhost:3000';
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+async function getPortfolio(address: string) {
+  const response = await axios.get(`${API_BASE}/portfolio/${address}`);
+  return response.data;
+}
 
-## Support
+async function getTokenBalances(address: string, chainIds?: number[]) {
+  const params = new URLSearchParams();
+  if (chainIds) {
+    chainIds.forEach(id => params.append('chainIds', id.toString()));
+  }
+  const response = await axios.get(
+    `${API_BASE}/portfolio/${address}/tokens?${params.toString()}`
+  );
+  return response.data;
+}
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+// Usage
+const portfolio = await getPortfolio('0x849151d7d0bf1f34b70d5cad5149d28cc2308bf1');
+console.log(`Total portfolio value: $${portfolio.totals.totalPortfolioValue}`);
+```
 
-## Stay in touch
+### Python
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```python
+import requests
+
+API_BASE = 'http://localhost:3000'
+
+def get_portfolio(address: str) -> dict:
+    response = requests.get(f'{API_BASE}/portfolio/{address}')
+    response.raise_for_status()
+    return response.json()
+
+def get_token_balances(address: str, chain_ids: list = None) -> dict:
+    params = {}
+    if chain_ids:
+        params['chainIds'] = chain_ids
+    response = requests.get(f'{API_BASE}/portfolio/{address}/tokens', params=params)
+    response.raise_for_status()
+    return response.json()
+
+# Usage
+portfolio = get_portfolio('0x849151d7d0bf1f34b70d5cad5149d28cc2308bf1')
+print(f"Total portfolio value: ${portfolio['totals']['totalPortfolioValue']}")
+```
+
+## Supported Chain IDs
+
+| Chain | ID |
+|-------|-----|
+| Ethereum | 1 |
+| Polygon | 137 |
+| Arbitrum | 42161 |
+| Optimism | 10 |
+| Base | 8453 |
+| BSC | 56 |
+| Avalanche | 43114 |
+
+## Error Handling
+
+The API returns standard HTTP status codes:
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Invalid address format or validation error |
+| 401 | Invalid or missing API key |
+| 500 | Internal server error |
+
+Error response format:
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid Ethereum address format",
+  "error": "Bad Request"
+}
+```
+
+## Address Validation
+
+Ethereum addresses must match the pattern: `^0x[a-fA-F0-9]{40}$`
+
+## Caching
+
+Responses are cached for 90 seconds (configurable via `CACHE_TTL` env var) with a maximum of 100 cached items. The cache key is based on the endpoint path and query parameters.
+
+## Testing
+
+```bash
+# Unit tests
+yarn test
+
+# Watch mode
+yarn test:watch
+
+# Coverage report
+yarn test:cov
+
+# E2E tests
+yarn test:e2e
+```
+
+## Architecture Notes
+
+- **Modular Design**: Portfolio logic is encapsulated in its own NestJS module
+- **Service Layer**: Business logic (GraphQL queries) separated from controllers
+- **Parallel Execution**: The complete portfolio endpoint uses `Promise.all()` to fetch all data concurrently
+- **Type Safety**: All responses use validated DTOs defined in `src/portfolio/dto/portfolio.dto.ts`
+- **External API**: Queries the Zapper GraphQL API at `https://public.zapper.xyz/graphql`
+
+## Key Files for Integration
+
+| File | Purpose |
+|------|---------|
+| `src/portfolio/portfolio.controller.ts` | All API endpoint definitions |
+| `src/portfolio/portfolio.service.ts` | GraphQL query logic |
+| `src/portfolio/dto/portfolio.dto.ts` | TypeScript interfaces for all response types |
+| `src/main.ts` | Server bootstrap and port configuration |
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT

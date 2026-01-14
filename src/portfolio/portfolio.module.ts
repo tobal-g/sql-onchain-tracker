@@ -16,5 +16,6 @@ import { PortfolioController } from './portfolio.controller';
   ],
   controllers: [PortfolioController],
   providers: [PortfolioService],
+  exports: [PortfolioService], // Export for use in SyncModule
 })
 export class PortfolioModule {}

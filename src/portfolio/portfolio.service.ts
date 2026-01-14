@@ -503,9 +503,9 @@ export class PortfolioService {
   }
 
   private validateAddress(address: string): boolean {
-    // Basic Ethereum address validation
     const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
-    return ethAddressRegex.test(address);
+    const btcAddressRegex = /^bc1[a-zA-HJ-NP-Z0-9]{25,39}$/;
+    return ethAddressRegex.test(address) || btcAddressRegex.test(address);
   }
 
   async getTokenBalances(
