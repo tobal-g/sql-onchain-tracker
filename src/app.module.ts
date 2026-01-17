@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { PortfolioModule } from './portfolio/portfolio.module';
 import { DatabaseModule } from './database/database.module';
 import { SyncModule } from './sync/sync.module';
+import { YahooFinanceModule } from './modules/yahoo-finance/yahoo-finance.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { SyncModule } from './sync/sync.module';
     DatabaseModule,
     PortfolioModule,
     SyncModule,
+    YahooFinanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

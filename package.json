@@ -32,7 +32,8 @@
     "class-validator": "^0.14.2",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "yahoo-finance2": "^3.11.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
