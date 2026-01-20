@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { SyncService } from './sync.service';
 import { PortfolioService } from '../portfolio/portfolio.service';
+import { PositionsService } from '../modules/manual-entry/services/positions.service';
 import { DATABASE_POOL } from '../database/database.module';
 
 describe('SyncService', () => {
@@ -9,6 +10,7 @@ describe('SyncService', () => {
   let mockPool: any;
   let mockPortfolioService: any;
   let mockConfigService: any;
+  let mockPositionsService: any;
 
   // Sample test data
   const mockCustodians = [
@@ -72,12 +74,17 @@ describe('SyncService', () => {
       }),
     };
 
+    mockPositionsService = {
+      getZapperAssetIdsForCustodian: jest.fn().mockResolvedValue(new Set<number>()),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SyncService,
         { provide: DATABASE_POOL, useValue: mockPool },
         { provide: PortfolioService, useValue: mockPortfolioService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: PositionsService, useValue: mockPositionsService },
       ],
     }).compile();
 

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { DATABASE_POOL } from '../database/database.module';
 import { PortfolioService } from '../portfolio/portfolio.service';
+import { PositionsService } from '../modules/manual-entry/services/positions.service';
 import { SyncResponseDto } from './dto/sync-response.dto';
 import {
   TokenBalanceDto,
@@ -27,6 +28,7 @@ interface Asset {
 interface SyncSummary {
   walletsProcessed: number;
   positionsUpdated: number;
+  positionsZeroed: number;
   pricesUpdated: number;
   errors: string[];
 }
@@ -40,6 +42,7 @@ export class SyncService {
     @Inject(DATABASE_POOL) private readonly pool: Pool,
     private readonly portfolioService: PortfolioService,
     private readonly configService: ConfigService,
+    private readonly positionsService: PositionsService,
   ) {
     this.rateLimitDelay = this.configService.get<number>('SYNC_RATE_LIMIT_MS', 1000);
   }
@@ -178,7 +181,7 @@ export class SyncService {
 
   /**
    * Processes a single token: matches to asset, upserts position and price.
-   * Returns true if processed, false if skipped.
+   * Returns asset ID if processed, null if skipped.
    */
   private async processToken(
     tokenAddress: string,
@@ -189,9 +192,9 @@ export class SyncService {
     assetLookup: Map<string, Asset>,
     summary: SyncSummary,
     walletAddress: string,
-  ): Promise<void> {
+  ): Promise<number | null> {
     const normalizedAddress = tokenAddress?.toLowerCase();
-    if (!normalizedAddress) return;
+    if (!normalizedAddress) return null;
 
     // Native tokens (ETH, BTC) share the zero address - match by symbol instead
     const isNativeToken = normalizedAddress === '0x0000000000000000000000000000000000000000';
@@ -208,7 +211,7 @@ export class SyncService {
       this.logger.warn(
         `Unknown token: ${symbol} (${normalizedAddress}) - skipping`,
       );
-      return;
+      return null;
     }
 
     try {
@@ -221,15 +224,19 @@ export class SyncService {
         await this.upsertPriceHistory(asset.id, price);
         summary.pricesUpdated++;
       }
+
+      return asset.id;
     } catch (error) {
       const errorMsg = `Wallet ${this.truncateAddress(walletAddress)}: Failed to upsert ${symbol}: ${error.message}`;
       this.logger.error(errorMsg);
       summary.errors.push(errorMsg);
+      return null;
     }
   }
 
   /**
    * Processes token balances from Zapper response.
+   * Returns Set of asset IDs that were found and processed.
    */
   private async processTokenBalances(
     tokens: TokenBalanceDto[],
@@ -237,9 +244,10 @@ export class SyncService {
     assetLookup: Map<string, Asset>,
     summary: SyncSummary,
     walletAddress: string,
-  ): Promise<void> {
+  ): Promise<Set<number>> {
+    const foundAssetIds = new Set<number>();
     for (const token of tokens) {
-      await this.processToken(
+      const assetId = await this.processToken(
         token.tokenAddress,
         token.symbol,
         token.balance,
@@ -249,11 +257,16 @@ export class SyncService {
         summary,
         walletAddress,
       );
+      if (assetId !== null) {
+        foundAssetIds.add(assetId);
+      }
     }
+    return foundAssetIds;
   }
 
   /**
    * Processes DeFi app balances from Zapper response.
+   * Returns Set of asset IDs that were found and processed.
    */
   private async processAppBalances(
     appBalances: AppBalanceDto[],
@@ -261,13 +274,14 @@ export class SyncService {
     assetLookup: Map<string, Asset>,
     summary: SyncSummary,
     walletAddress: string,
-  ): Promise<void> {
+  ): Promise<Set<number>> {
+    const foundAssetIds = new Set<number>();
     for (const appBalance of appBalances) {
       for (const position of appBalance.positionBalances) {
         if (position.type === 'app-token') {
           // AppTokenPositionBalanceDto
           const appToken = position as AppTokenPositionBalanceDto;
-          await this.processToken(
+          const assetId = await this.processToken(
             appToken.address,
             appToken.symbol,
             appToken.balance,
@@ -277,13 +291,16 @@ export class SyncService {
             summary,
             walletAddress,
           );
+          if (assetId !== null) {
+            foundAssetIds.add(assetId);
+          }
         } else if (position.type === 'contract-position') {
           // ContractPositionBalanceDto - has nested tokens
           const contractPos = position as ContractPositionBalanceDto;
           if (contractPos.tokens) {
             for (const tokenWithMeta of contractPos.tokens) {
               const token = tokenWithMeta.token;
-              await this.processToken(
+              const assetId = await this.processToken(
                 token.address,
                 token.symbol,
                 token.balance,
@@ -293,11 +310,15 @@ export class SyncService {
                 summary,
                 walletAddress,
               );
+              if (assetId !== null) {
+                foundAssetIds.add(assetId);
+              }
             }
           }
         }
       }
     }
+    return foundAssetIds;
   }
 
   /**
@@ -315,13 +336,16 @@ export class SyncService {
     this.logger.log(`Processing ${isBtc ? 'BTC' : 'EVM'} wallet: ${truncated}`);
 
     try {
+      // Get existing Zapper position asset IDs BEFORE processing
+      const existingAssetIds = await this.positionsService.getZapperAssetIdsForCustodian(custodian.id);
+
       // Fetch token balances (use BTC chainId for Bitcoin wallets)
       const tokenBalances = await this.portfolioService.getTokenBalances(
         walletAddress,
         { first: 100, chainIds: isBtc ? [6172014] : undefined },
       );
 
-      await this.processTokenBalances(
+      const tokenFoundIds = await this.processTokenBalances(
         tokenBalances.byToken,
         custodian.id,
         assetLookup,
@@ -330,19 +354,32 @@ export class SyncService {
       );
 
       // Fetch DeFi app balances (skip for BTC - no DeFi on Bitcoin)
+      let appFoundIds = new Set<number>();
       if (!isBtc) {
         const appBalances = await this.portfolioService.getAppBalances(
           walletAddress,
           { first: 50 },
         );
 
-        await this.processAppBalances(
+        appFoundIds = await this.processAppBalances(
           appBalances.byApp,
           custodian.id,
           assetLookup,
           summary,
           walletAddress,
         );
+      }
+
+      // Combine all found asset IDs
+      const allFoundIds = new Set([...tokenFoundIds, ...appFoundIds]);
+
+      // Zero positions not found in Zapper response
+      for (const assetId of existingAssetIds) {
+        if (!allFoundIds.has(assetId)) {
+          await this.upsertPosition(assetId, custodian.id, 0);
+          summary.positionsZeroed++;
+          this.logger.log(`Zeroed position: asset_id=${assetId}, custodian_id=${custodian.id}`);
+        }
       }
 
       summary.walletsProcessed++;
@@ -364,6 +401,7 @@ export class SyncService {
     const summary: SyncSummary = {
       walletsProcessed: 0,
       positionsUpdated: 0,
+      positionsZeroed: 0,
       pricesUpdated: 0,
       errors: [],
     };

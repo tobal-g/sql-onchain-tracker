@@ -14,6 +14,12 @@ export class SyncSummaryDto {
   positionsUpdated: number;
 
   @ApiProperty({
+    description: 'Number of positions set to zero (sold tokens)',
+    example: 2,
+  })
+  positionsZeroed: number;
+
+  @ApiProperty({
     description: 'Number of price history records upserted',
     example: 8,
   })
