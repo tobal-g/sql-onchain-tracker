@@ -5,7 +5,7 @@ import {
   StockSyncResponseDto,
   PriceSyncResultDto,
 } from './dto/stock-sync-response.dto';
-import yahooFinance from 'yahoo-finance2';
+import YahooFinance from 'yahoo-finance2';
 
 // Types for database rows
 interface Asset {
@@ -25,6 +25,7 @@ interface SyncSummary {
 export class YahooFinanceService {
   private readonly logger = new Logger(YahooFinanceService.name);
   private readonly rateLimitDelay = 500; // 500ms between Yahoo Finance requests
+  private readonly yahooFinance = new YahooFinance();
 
   constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}
 
@@ -97,7 +98,7 @@ export class YahooFinanceService {
    */
   async fetchPrice(ticker: string): Promise<number | null> {
     try {
-      const quote = await yahooFinance.quote(ticker) as { regularMarketPrice?: number };
+      const quote = await this.yahooFinance.quote(ticker) as { regularMarketPrice?: number };
       const price = quote?.regularMarketPrice;
 
       if (typeof price !== 'number' || price <= 0) {

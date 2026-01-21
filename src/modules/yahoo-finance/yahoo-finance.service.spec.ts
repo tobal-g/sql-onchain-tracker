@@ -3,11 +3,13 @@ import { ServiceUnavailableException } from '@nestjs/common';
 import { YahooFinanceService } from './yahoo-finance.service';
 import { DATABASE_POOL } from '../../database/database.module';
 
-// Mock yahoo-finance2
+// Mock yahoo-finance2 (v3 class-based API)
 const mockQuote = jest.fn();
 jest.mock('yahoo-finance2', () => ({
-  default: {
-    quote: (...args: unknown[]) => mockQuote(...args),
+  default: class MockYahooFinance {
+    quote(...args: unknown[]) {
+      return mockQuote(...args);
+    }
   },
 }));
 
