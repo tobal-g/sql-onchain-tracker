@@ -50,7 +50,7 @@ describe('PortfolioService', () => {
   const createMockConfigService = () => ({
     get: jest.fn((key: string, defaultValue?: any) => {
       const config = {
-        ZAPPER_API_URL: 'https://api.zapper.xyz/v2/graphql',
+        ZAPPER_API_URL: 'https://public.zapper.xyz/graphql',
         ZAPPER_API_KEY: 'test-api-key',
         CACHE_TTL: 90,
       };
@@ -465,7 +465,7 @@ describe('PortfolioService', () => {
       expect(result.byToken[0].network.name).toBe('Base');
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        'https://api.zapper.xyz/v2/graphql',
+        'https://public.zapper.xyz/graphql',
         expect.objectContaining({
           query: expect.stringContaining('TokenBalances'),
           variables: expect.objectContaining({
@@ -477,7 +477,7 @@ describe('PortfolioService', () => {
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': 'Bearer test-api-key',
+            'x-zapper-api-key': 'test-api-key',
           }),
           timeout: 30000,
         }),
@@ -506,21 +506,19 @@ describe('PortfolioService', () => {
       mockedAxios.post.mockResolvedValueOnce(mockTokenBalancesResponse);
 
       const queryParams = {
-        chainIds: [8453],
+        chainIds: [1],
         first: 10,
-        minBalanceUSD: 100,
       };
 
       await service.getTokenBalances(validAddress, queryParams);
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        'https://api.zapper.xyz/v2/graphql',
+        'https://public.zapper.xyz/graphql',
         expect.objectContaining({
           variables: expect.objectContaining({
             addresses: [validAddress],
             first: 10,
-            chainIds: [8453],
-            filters: { minBalanceUSD: 100 },
+            chainIds: [1],
           }),
         }),
         expect.any(Object),

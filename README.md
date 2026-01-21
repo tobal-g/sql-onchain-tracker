@@ -1,6 +1,6 @@
 # w3g-onchain-service
 
-A blockchain portfolio management REST API built with NestJS that provides comprehensive wallet analytics, portfolio tracking, and automated database synchronization across multiple blockchain networks. It aggregates data from the Zapper Protocol via GraphQL to deliver real-time information about token balances, DeFi positions, NFT holdings, claimable rewards, and portfolio totals.
+A blockchain portfolio management REST API built with NestJS that provides comprehensive wallet analytics, portfolio tracking, and automated database synchronization across multiple blockchain networks. It aggregates data from the Zapper Protocol via GraphQL and Yahoo Finance API to deliver real-time information about token balances, DeFi positions, NFT holdings, claimable rewards, portfolio totals, and stock/CEDEAR prices. Includes a React dashboard for portfolio visualization.
 
 ## Table of Contents
 
@@ -14,8 +14,10 @@ A blockchain portfolio management REST API built with NestJS that provides compr
 - [API Reference](#api-reference)
   - [Health Check](#health-check)
   - [Portfolio Endpoints](#portfolio-endpoints)
+  - [Manual Entry Endpoints](#manual-entry-endpoints)
   - [Sync Endpoints](#sync-endpoints)
 - [Database Schema](#database-schema)
+- [Frontend Dashboard](#frontend-dashboard)
 - [Integration Examples](#integration-examples)
 - [Supported Chains](#supported-chains)
 - [Error Handling](#error-handling)
@@ -32,7 +34,9 @@ This service enables Web3 applications to display detailed wallet portfolio info
 
 1. **Portfolio Querying**: Real-time wallet analytics via REST API
 2. **Database Synchronization**: Automated daily sync of wallet holdings to PostgreSQL for historical tracking and analysis
-3. **Price History**: Daily price snapshots for all tracked assets
+3. **Price History**: Daily price snapshots for all tracked assets (crypto via Zapper, stocks/CEDEARs via Yahoo Finance)
+4. **Manual Portfolio Management**: Track assets, custodians, positions, and transactions via CRUD endpoints
+5. **Dashboard Visualization**: React frontend for portfolio overview with charts and data visualization
 
 ### Key Capabilities
 
@@ -72,15 +76,40 @@ PostgreSQL connection management:
 - SSL support for Neon.tech
 - Global module pattern for shared database access
 
-### 4. Authentication Guard
+### 4. Manual Entry Module
+Full CRUD operations for manual portfolio management:
+- **Assets**: Master list of trackable assets with symbol, name, and type
+- **Custodians**: Wallets and brokers holding assets
+- **Positions**: Current holdings (quantity per asset per custodian)
+- **Transactions**: Transaction logging with automatic position updates
+- **Asset Types**: Asset classification (Crypto, Stock, CEDEAR, etc.)
+- **Portfolio Summary**: Aggregated portfolio overview with breakdowns
+
+### 5. Yahoo Finance Module
+Stock and CEDEAR price synchronization:
+- Fetches prices for assets with `price_api_source = 'yahoofinance'`
+- Supports CEDEAR detection (tickers ending with `.BA`)
+- Converts ARS prices to USD using CCL rate from DolarAPI
+- Daily price history updates
+
+### 6. Authentication Guard
 API key-based authentication for protected endpoints:
 - Optional in development (no key = open access)
 - Required in production via `SYNC_API_KEY` env var
 - Uses `x-api-key` header
 
+### 7. Frontend Dashboard
+React-based portfolio visualization:
+- Portfolio overview with total value and statistics
+- Charts: allocation by type, by custodian, top holdings
+- Pages for managing custodians, positions, assets, and transactions
+- Real-time data fetching with React Query
+
 ---
 
 ## Technologies
+
+### Backend Stack
 
 | Category | Technology | Version | Purpose |
 |----------|------------|---------|---------|
@@ -93,35 +122,67 @@ API key-based authentication for protected endpoints:
 | Validation | class-validator | 0.14.x | DTO validation |
 | Documentation | Swagger/OpenAPI | 11.x | API documentation |
 | Config | @nestjs/config | 4.x | Environment configuration |
+| Price Data | yahoo-finance2 | 3.11.x | Stock and CEDEAR price fetching |
+
+### Frontend Stack
+
+| Category | Technology | Version | Purpose |
+|----------|------------|---------|---------|
+| Framework | React | 19.x | UI library |
+| Language | TypeScript | 5.9.x | Type-safe development |
+| Build Tool | Vite | 7.x | Fast build tooling |
+| Routing | React Router | 7.x | Client-side routing |
+| Data Fetching | TanStack Query | 5.x | Server state management |
+| Styling | Tailwind CSS | 4.x | Utility-first CSS |
+| Charting | Recharts | 3.6.x | Data visualization |
+
+### External APIs
+
+| API | Purpose |
+|-----|---------|
+| Zapper Protocol | Blockchain portfolio data via GraphQL |
+| Yahoo Finance | Stock and CEDEAR prices |
+| DolarAPI | CCL exchange rate for ARS-USD conversion |
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           w3g-onchain-service                           │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────────┐   │
-│  │ Portfolio Module│   │   Sync Module   │   │  Database Module    │   │
-│  │                 │   │                 │   │  (Global)           │   │
-│  │ • Controller    │   │ • Controller    │   │                     │   │
-│  │ • Service       │   │ • Service       │   │ • PostgreSQL Pool   │   │
-│  │ • DTOs          │   │ • DTOs          │   │ • SSL/Neon.tech     │   │
-│  │ • Caching       │   │ • API Key Guard │   │                     │   │
-│  └────────┬────────┘   └────────┬────────┘   └──────────┬──────────┘   │
-│           │                     │                       │              │
-│           │                     │                       │              │
-│           ▼                     ▼                       ▼              │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │                        External Services                         │   │
-│  ├─────────────────────────────┬───────────────────────────────────┤   │
-│  │   Zapper GraphQL API        │      PostgreSQL (Neon.tech)       │   │
-│  │   https://public.zapper.xyz │      Portfolio DB                 │   │
-│  └─────────────────────────────┴───────────────────────────────────┘   │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                              w3g-onchain-service                                   │
+├───────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                    │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐  │
+│  │ Portfolio Module│  │   Sync Module   │  │ Manual Entry    │  │Yahoo Finance │  │
+│  │                 │  │                 │  │ Module          │  │Module        │  │
+│  │ • Zapper Query  │  │ • Wallet Sync   │  │ • Assets CRUD   │  │• Stock Sync  │  │
+│  │ • Caching       │  │ • Price Sync    │  │ • Custodians    │  │• CEDEAR Sync │  │
+│  │ • DTOs          │  │ • Rate Limiting │  │ • Positions     │  │• CCL Rate    │  │
+│  └────────┬────────┘  └────────┬────────┘  │ • Transactions  │  └──────┬───────┘  │
+│           │                    │           │ • Summary       │         │          │
+│           │                    │           └────────┬────────┘         │          │
+│           │                    │                    │                  │          │
+│           ▼                    ▼                    ▼                  ▼          │
+│  ┌────────────────────────────────────────────────────────────────────────────┐  │
+│  │                         Database Module (Global)                            │  │
+│  │                         PostgreSQL Pool • SSL/Neon.tech                     │  │
+│  └────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                    │
+├───────────────────────────────────────────────────────────────────────────────────┤
+│                              External Services                                     │
+├─────────────────────┬───────────────────┬──────────────────┬──────────────────────┤
+│   Zapper GraphQL    │   Yahoo Finance   │    DolarAPI      │ PostgreSQL (Neon)    │
+│   Crypto Balances   │   Stock Prices    │    CCL Rate      │ Portfolio DB         │
+└─────────────────────┴───────────────────┴──────────────────┴──────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                              Frontend (React)                                      │
+├───────────────────────────────────────────────────────────────────────────────────┤
+│  Dashboard │ Custodians │ Positions │ Assets │ Transactions                       │
+│  ────────────────────────────────────────────────────────────                     │
+│  React 19 • TanStack Query • Tailwind CSS • Recharts                              │
+└───────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Data Flow
@@ -138,30 +199,66 @@ API key-based authentication for protected endpoints:
 ## Project Structure
 
 ```
-src/
-├── main.ts                           # Application entry point (PORT config)
-├── app.module.ts                     # Root module (imports all feature modules)
-├── app.controller.ts                 # Health check endpoint (GET /)
-├── app.service.ts                    # Basic service
-├── database/
-│   └── database.module.ts            # PostgreSQL connection pool (Global module)
-├── guards/
-│   └── api-key.guard.ts              # x-api-key authentication guard
-├── portfolio/
-│   ├── portfolio.module.ts           # Portfolio feature module (caching config)
-│   ├── portfolio.controller.ts       # 7 REST endpoints for portfolio queries
-│   ├── portfolio.service.ts          # GraphQL queries to Zapper API
-│   ├── portfolio.controller.spec.ts  # Controller unit tests
-│   ├── portfolio.service.spec.ts     # Service unit tests
-│   └── dto/
-│       └── portfolio.dto.ts          # 25+ Data Transfer Objects
-└── sync/
-    ├── sync.module.ts                # Sync feature module
-    ├── sync.controller.ts            # POST /sync/portfolio endpoint
-    ├── sync.service.ts               # Wallet sync logic
-    ├── sync.service.spec.ts          # Service unit tests
-    └── dto/
-        └── sync-response.dto.ts      # Sync response DTOs
+├── src/                                  # Backend source code (NestJS)
+│   ├── main.ts                           # Application entry point
+│   ├── app.module.ts                     # Root module
+│   ├── app.controller.ts                 # Health check endpoint (GET /)
+│   ├── database/
+│   │   └── database.module.ts            # PostgreSQL connection pool (Global)
+│   ├── guards/
+│   │   └── api-key.guard.ts              # x-api-key authentication guard
+│   ├── portfolio/
+│   │   ├── portfolio.module.ts           # Portfolio feature module
+│   │   ├── portfolio.controller.ts       # 7 REST endpoints for Zapper queries
+│   │   ├── portfolio.service.ts          # GraphQL queries to Zapper API
+│   │   └── dto/
+│   │       └── portfolio.dto.ts          # 25+ Data Transfer Objects
+│   ├── sync/
+│   │   ├── sync.module.ts                # Sync feature module
+│   │   ├── sync.controller.ts            # POST /sync/portfolio endpoint
+│   │   ├── sync.service.ts               # Wallet sync logic
+│   │   └── dto/
+│   │       └── sync-response.dto.ts      # Sync response DTOs
+│   └── modules/
+│       ├── yahoo-finance/
+│       │   ├── yahoo-finance.module.ts   # Yahoo Finance module
+│       │   ├── yahoo-finance.controller.ts # POST /sync/stocks endpoint
+│       │   ├── yahoo-finance.service.ts  # Stock/CEDEAR price fetching
+│       │   └── dto/
+│       └── manual-entry/
+│           ├── manual-entry.module.ts    # Manual entry feature module
+│           ├── controllers/
+│           │   ├── assets.controller.ts
+│           │   ├── custodians.controller.ts
+│           │   ├── positions.controller.ts
+│           │   ├── transactions.controller.ts
+│           │   ├── asset-types.controller.ts
+│           │   └── portfolio-summary.controller.ts
+│           ├── services/                 # Business logic for each controller
+│           └── dto/                      # Data transfer objects
+├── frontend/                             # React frontend
+│   ├── src/
+│   │   ├── main.tsx                      # React entry point
+│   │   ├── App.tsx                       # Root component with routing
+│   │   ├── pages/
+│   │   │   ├── Dashboard.tsx             # Portfolio overview with charts
+│   │   │   ├── Custodians.tsx
+│   │   │   ├── Positions.tsx
+│   │   │   ├── Assets.tsx
+│   │   │   └── Transactions.tsx
+│   │   ├── components/
+│   │   │   ├── layout/                   # Layout and Sidebar
+│   │   │   └── common/                   # LoadingSpinner, Toast, ErrorBoundary
+│   │   ├── hooks/
+│   │   │   └── usePortfolio.ts           # Portfolio data fetching hook
+│   │   ├── api/
+│   │   │   └── client.ts                 # Axios HTTP client
+│   │   └── types/
+│   │       └── index.ts                  # TypeScript types
+│   ├── package.json
+│   └── vite.config.ts
+├── test/                                 # E2E tests
+└── prds/                                 # Product requirement documents
 ```
 
 ---
@@ -220,6 +317,12 @@ SYNC_API_KEY=your_secret_sync_api_key
 # Delay between wallet syncs in milliseconds (defaults to 1000)
 # Helps prevent Zapper API rate limiting
 SYNC_RATE_LIMIT_MS=1000
+
+# ============================================
+# CORS CONFIGURATION (Optional)
+# ============================================
+# Frontend origin for CORS (defaults to http://localhost:5173)
+CORS_ORIGIN=http://localhost:5173
 ```
 
 ### Environment Variables Reference
@@ -229,10 +332,12 @@ SYNC_RATE_LIMIT_MS=1000
 | `ZAPPER_API_KEY` | Yes | - | API key for Zapper GraphQL API |
 | `ZAPPER_API_URL` | No | `https://public.zapper.xyz/graphql` | Zapper API endpoint |
 | `DATABASE_URL` | For sync | - | PostgreSQL connection string |
+| `DATABASE_SCHEMA` | No | `public` | PostgreSQL schema name |
 | `PORT` | No | `3000` | Server port |
 | `CACHE_TTL` | No | `90` | Cache TTL in seconds |
 | `SYNC_API_KEY` | No | - | API key for sync endpoint (if unset, endpoint is open) |
 | `SYNC_RATE_LIMIT_MS` | No | `1000` | Delay between wallet syncs |
+| `CORS_ORIGIN` | No | `http://localhost:5173` | Frontend origin for CORS |
 
 ---
 
@@ -481,6 +586,140 @@ Returns complete portfolio overview (all data above in a single response). Execu
 
 ---
 
+### Manual Entry Endpoints
+
+All manual entry endpoints are protected by optional API key authentication (same as sync endpoints).
+
+#### Assets
+
+```http
+GET /assets
+GET /assets?symbol=BTC
+POST /assets
+```
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/assets` | List all assets (optional symbol filter) |
+| POST | `/assets` | Create new asset |
+
+**Create Asset Request:**
+```json
+{
+  "symbol": "BTC",
+  "name": "Bitcoin",
+  "asset_type_id": 1,
+  "price_api_source": "zapper",
+  "api_identifier": "btc"
+}
+```
+
+#### Custodians
+
+```http
+GET /custodians
+POST /custodians
+```
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/custodians` | List all custodians |
+| POST | `/custodians` | Create new custodian |
+
+**Create Custodian Request:**
+```json
+{
+  "name": "Ledger Nano X",
+  "type": "hardware_wallet",
+  "description": "Main cold storage",
+  "wallet_address": "0x..."
+}
+```
+
+**Custodian Types:** `hardware_wallet`, `software_wallet`, `broker`, `exchange`, `multisig_wallet`
+
+#### Positions
+
+```http
+GET /positions
+GET /positions?asset_id=1&custodian_id=2
+POST /positions
+POST /positions/cash
+DELETE /positions/:id
+```
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/positions` | List positions (optional asset_id, custodian_id filters) |
+| POST | `/positions` | Upsert position (create or update) |
+| POST | `/positions/cash` | Quick cash position update |
+| DELETE | `/positions/:id` | Delete position |
+
+**Upsert Position Request:**
+```json
+{
+  "asset_id": 1,
+  "custodian_id": 2,
+  "quantity": 1.5
+}
+```
+
+#### Transactions
+
+```http
+GET /transactions
+POST /transactions
+```
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/transactions` | List all transactions |
+| POST | `/transactions` | Log transaction (updates position automatically) |
+
+#### Asset Types
+
+```http
+GET /asset-types
+POST /asset-types
+```
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/asset-types` | List asset types |
+| POST | `/asset-types` | Create asset type |
+
+#### Portfolio Summary
+
+```http
+GET /portfolio/summary
+```
+
+Returns aggregated portfolio overview with:
+- Total value in USD
+- Breakdown by asset type
+- Breakdown by custodian
+- Top holdings
+- Last updated timestamp
+
+**Response:**
+```json
+{
+  "totalValueUsd": 125000.50,
+  "byAssetType": [
+    { "name": "Crypto", "valueUsd": 100000, "percentage": 80 }
+  ],
+  "byCustodian": [
+    { "name": "Ledger", "valueUsd": 75000, "percentage": 60 }
+  ],
+  "topHoldings": [
+    { "symbol": "BTC", "name": "Bitcoin", "valueUsd": 50000 }
+  ],
+  "lastUpdated": "2026-01-20T12:00:00.000Z"
+}
+```
+
+---
+
 ### Sync Endpoints
 
 #### Sync All Portfolios
@@ -537,6 +776,44 @@ Fetches all wallets from the database, queries Zapper API for each, and updates 
    - Upsert positions (asset_id, custodian_id, quantity)
    - Upsert price history (asset_id, price_usd, price_date)
 3. Apply rate limiting between wallet calls
+4. Return summary
+
+---
+
+#### Sync Stock Prices
+
+```http
+POST /sync/stocks
+```
+
+Fetches stock and CEDEAR prices from Yahoo Finance API and updates price history.
+
+**Headers:**
+| Header | Required | Description |
+|--------|----------|-------------|
+| `x-api-key` | If `SYNC_API_KEY` is set | Authentication key |
+
+**Response:**
+```json
+{
+  "success": true,
+  "syncedAt": "2026-01-20T12:00:00.000Z",
+  "summary": {
+    "assetsProcessed": 15,
+    "pricesUpdated": 15,
+    "errors": []
+  }
+}
+```
+
+**Sync Logic:**
+1. Query assets where `price_api_source = 'yahoofinance'`
+2. For each asset:
+   - Fetch price from Yahoo Finance using ticker symbol
+   - If CEDEAR (ticker ends with `.BA`), fetch CCL rate from DolarAPI
+   - Convert ARS to USD using CCL rate for CEDEARs
+   - Upsert daily price to price_history table
+3. Apply rate limiting (500ms between requests)
 4. Return summary
 
 ---
@@ -607,6 +884,60 @@ Tokens from Zapper are matched to the `assets` table by:
 **Special Cases:**
 - **ETH native**: tokenAddress = `0x0000000000000000000000000000000000000000`
 - **BTC**: Matched by symbol since Bitcoin has no contract address
+
+---
+
+## Frontend Dashboard
+
+The project includes a React-based dashboard for portfolio visualization.
+
+### Running the Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Development server (runs on http://localhost:5173)
+npm run dev
+
+# Production build
+npm run build
+npm run preview
+```
+
+### Pages
+
+| Page | Path | Description |
+|------|------|-------------|
+| Dashboard | `/` | Portfolio overview with charts and statistics |
+| Custodians | `/custodians` | Manage wallets and brokers |
+| Positions | `/positions` | View and manage holdings |
+| Assets | `/assets` | Manage asset master data |
+| Transactions | `/transactions` | Log and track transactions |
+
+### Dashboard Features
+
+- **Portfolio Statistics**: Total value, position count, asset types, custodians
+- **Allocation Charts**:
+  - Pie chart by asset type
+  - Pie chart by custodian
+  - Bar chart of top 6 holdings
+- **Positions Table**: First 15 positions with details
+
+### Tech Stack
+
+- **React 19** with TypeScript
+- **Vite** for fast development and building
+- **TanStack Query** for data fetching and caching
+- **Tailwind CSS 4** for styling
+- **Recharts** for charts and data visualization
+- **React Router 7** for client-side routing
+
+### Configuration
+
+The frontend connects to the backend API at `http://localhost:3000` by default. This can be configured in the API client (`frontend/src/api/client.ts`).
 
 ---
 
@@ -811,18 +1142,34 @@ yarn test:e2e
 
 ## Key Files Reference
 
+### Backend
+
 | File | Purpose |
 |------|---------|
-| `src/main.ts` | Server bootstrap and port configuration |
+| `src/main.ts` | Server bootstrap, CORS, Swagger setup |
 | `src/app.module.ts` | Root module importing all feature modules |
 | `src/database/database.module.ts` | PostgreSQL connection pool (Global) |
 | `src/guards/api-key.guard.ts` | API key authentication guard |
-| `src/portfolio/portfolio.controller.ts` | 7 REST endpoints for portfolio queries |
+| `src/portfolio/portfolio.controller.ts` | 7 REST endpoints for Zapper queries |
 | `src/portfolio/portfolio.service.ts` | Zapper GraphQL query logic |
-| `src/portfolio/dto/portfolio.dto.ts` | 25+ TypeScript DTOs |
-| `src/sync/sync.controller.ts` | Sync endpoint (POST /sync/portfolio) |
+| `src/sync/sync.controller.ts` | POST /sync/portfolio endpoint |
 | `src/sync/sync.service.ts` | Wallet sync business logic |
-| `src/sync/dto/sync-response.dto.ts` | Sync response DTOs |
+| `src/modules/yahoo-finance/yahoo-finance.service.ts` | Stock/CEDEAR price fetching |
+| `src/modules/manual-entry/manual-entry.module.ts` | Manual entry feature module |
+| `src/modules/manual-entry/controllers/*.ts` | CRUD controllers for assets, positions, etc. |
+| `src/modules/manual-entry/services/*.ts` | Business logic for manual entry |
+
+### Frontend
+
+| File | Purpose |
+|------|---------|
+| `frontend/src/main.tsx` | React entry point |
+| `frontend/src/App.tsx` | Root component with routing |
+| `frontend/src/pages/Dashboard.tsx` | Portfolio overview with charts |
+| `frontend/src/pages/Positions.tsx` | Positions management page |
+| `frontend/src/hooks/usePortfolio.ts` | Portfolio data fetching hook |
+| `frontend/src/api/client.ts` | Axios HTTP client configuration |
+| `frontend/src/components/layout/Layout.tsx` | Main layout with sidebar |
 
 ---
 

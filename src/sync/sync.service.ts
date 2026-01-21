@@ -198,14 +198,9 @@ export class SyncService {
 
     // Native tokens (ETH, BTC) share the zero address - match by symbol instead
     const isNativeToken = normalizedAddress === '0x0000000000000000000000000000000000000000';
-    let asset = isNativeToken
+    const asset = isNativeToken
       ? assetLookup.get(symbol.toLowerCase())
       : assetLookup.get(normalizedAddress);
-
-    // Fallback to symbol if address not found
-    if (!asset) {
-      asset = assetLookup.get(symbol.toLowerCase());
-    }
 
     if (!asset) {
       this.logger.warn(
