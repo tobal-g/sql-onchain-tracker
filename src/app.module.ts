@@ -7,11 +7,13 @@ import { DatabaseModule } from './database/database.module';
 import { SyncModule } from './sync/sync.module';
 import { YahooFinanceModule } from './modules/yahoo-finance/yahoo-finance.module';
 import { ManualEntryModule } from './modules/manual-entry/manual-entry.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
+    AuthModule, // Must be early for JwtAuthGuard availability
     ManualEntryModule, // Must be before PortfolioModule for /portfolio/summary route
     PortfolioModule,
     SyncModule,

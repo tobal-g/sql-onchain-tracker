@@ -12,12 +12,13 @@ import {
   ApiResponse,
   ApiInternalServerErrorResponse,
   ApiServiceUnavailableResponse,
+  ApiBearerAuth,
   ApiHeader,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { YahooFinanceService } from './yahoo-finance.service';
 import { StockSyncResponseDto } from './dto/stock-sync-response.dto';
-import { ApiKeyGuard } from '../../guards/api-key.guard';
+import { JwtOrApiKeyGuard } from '../../auth/guards/jwt-or-apikey.guard';
 
 @ApiTags('Sync')
 @Controller('sync/prices')
@@ -27,18 +28,19 @@ export class YahooFinanceController {
   constructor(private readonly yahooFinanceService: YahooFinanceService) {}
 
   @Post('stocks')
-  @UseGuards(ApiKeyGuard)
+  @UseGuards(JwtOrApiKeyGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiHeader({
+    name: 'x-api-key',
+    description: 'API key for automated/service authentication (alternative to Bearer token)',
+    required: false,
+  })
   @ApiOperation({
     summary: 'Sync stock/ETF/CEDEAR prices from Yahoo Finance',
     description:
       'Fetches prices for all assets with price_api_source = "yahoofinance" and stores them in the price_history table. ' +
       'CEDEAR prices (tickers ending in .BA) are converted from ARS to USD using the CCL exchange rate from DolarAPI. ' +
-      'Requires x-api-key header if SYNC_API_KEY is configured.',
-  })
-  @ApiHeader({
-    name: 'x-api-key',
-    description: 'API key for authentication (required if SYNC_API_KEY env var is set)',
-    required: false,
+      'Accepts either JWT Bearer token or x-api-key header.',
   })
   @ApiResponse({
     status: 200,

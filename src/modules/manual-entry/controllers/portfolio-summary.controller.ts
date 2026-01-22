@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PortfolioSummaryService } from '../services/portfolio-summary.service';
-import { ApiKeyGuard } from '../../../guards/api-key.guard';
+import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import { PortfolioSummaryResponseDto } from '../dto/portfolio-summary.dto';
 
 @ApiTags('Portfolio')
@@ -12,15 +12,11 @@ export class PortfolioSummaryController {
   ) {}
 
   @Get('summary')
-  @UseGuards(ApiKeyGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get portfolio summary',
     description: 'Aggregated portfolio overview with breakdowns',
-  })
-  @ApiHeader({
-    name: 'x-api-key',
-    description: 'API key for authentication',
-    required: false,
   })
   @ApiResponse({ status: 200, type: PortfolioSummaryResponseDto })
   async getPortfolioSummary(): Promise<PortfolioSummaryResponseDto> {

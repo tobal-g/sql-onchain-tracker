@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AssetsService } from '../services/assets.service';
-import { ApiKeyGuard } from '../../../guards/api-key.guard';
+import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import {
   ListAssetsQueryDto,
   CreateAssetDto,
@@ -11,12 +11,8 @@ import {
 
 @ApiTags('Assets')
 @Controller('assets')
-@UseGuards(ApiKeyGuard)
-@ApiHeader({
-  name: 'x-api-key',
-  description: 'API key for authentication',
-  required: false,
-})
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {}
 

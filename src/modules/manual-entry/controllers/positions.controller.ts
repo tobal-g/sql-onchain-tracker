@@ -15,11 +15,11 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiHeader,
+  ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
 import { PositionsService } from '../services/positions.service';
-import { ApiKeyGuard } from '../../../guards/api-key.guard';
+import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import {
   ListPositionsQueryDto,
   UpsertPositionDto,
@@ -31,12 +31,8 @@ import {
 
 @ApiTags('Positions')
 @Controller('positions')
-@UseGuards(ApiKeyGuard)
-@ApiHeader({
-  name: 'x-api-key',
-  description: 'API key for authentication',
-  required: false,
-})
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class PositionsController {
   constructor(private readonly positionsService: PositionsService) {}
 

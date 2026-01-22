@@ -11,12 +11,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiInternalServerErrorResponse,
+  ApiBearerAuth,
   ApiHeader,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { SyncService } from './sync.service';
 import { SyncResponseDto } from './dto/sync-response.dto';
-import { ApiKeyGuard } from '../guards/api-key.guard';
+import { JwtOrApiKeyGuard } from '../auth/guards/jwt-or-apikey.guard';
 
 @ApiTags('Sync')
 @Controller('sync')
@@ -26,17 +27,18 @@ export class SyncController {
   constructor(private readonly syncService: SyncService) {}
 
   @Post('portfolio')
-  @UseGuards(ApiKeyGuard)
+  @UseGuards(JwtOrApiKeyGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiHeader({
+    name: 'x-api-key',
+    description: 'API key for automated/service authentication (alternative to Bearer token)',
+    required: false,
+  })
   @ApiOperation({
     summary: 'Sync all wallet portfolios',
     description:
       'Fetches all wallets from database, queries Zapper API for each, and updates positions and prices in the database. ' +
-      'Requires x-api-key header if SYNC_API_KEY is configured.',
-  })
-  @ApiHeader({
-    name: 'x-api-key',
-    description: 'API key for authentication (required if SYNC_API_KEY env var is set)',
-    required: false,
+      'Accepts either JWT Bearer token or x-api-key header.',
   })
   @ApiResponse({
     status: 200,

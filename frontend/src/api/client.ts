@@ -17,6 +17,8 @@ import type {
   Custodian,
 } from '../types';
 
+const TOKEN_KEY = 'accessToken';
+
 // Create axios instance with base configuration
 // In production, VITE_API_URL should point to the backend (e.g., https://your-backend.railway.app)
 // In development, it falls back to '/api' which is proxied by Vite
@@ -25,16 +27,31 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Include cookies for refresh token
 });
 
-// Add API key to requests if available
+// Add Bearer token to requests
 api.interceptors.request.use((config) => {
-  const apiKey = import.meta.env.VITE_API_KEY;
-  if (apiKey) {
-    config.headers['x-api-key'] = apiKey;
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+// Handle 401 responses by redirecting to login
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear token and redirect to login
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem('tokenExpiry');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Portfolio Summary
 export const getPortfolioSummary = async (): Promise<PortfolioSummary> => {

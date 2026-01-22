@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: ChartIcon },
@@ -39,11 +40,26 @@ function BankIcon({ className }: { className?: string }) {
   );
 }
 
+function LogoutIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+    </svg>
+  );
+}
+
 interface SidebarProps {
   onClose?: () => void;
 }
 
 export default function Sidebar({ onClose }: SidebarProps) {
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    onClose?.();
+  };
+
   return (
     <div className="flex h-full w-64 flex-col bg-gray-900">
       <div className="flex h-16 items-center justify-between border-b border-gray-800 px-4">
@@ -79,6 +95,15 @@ export default function Sidebar({ onClose }: SidebarProps) {
           </NavLink>
         ))}
       </nav>
+      <div className="border-t border-gray-800 px-2 py-4">
+        <button
+          onClick={handleLogout}
+          className="group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
+        >
+          <LogoutIcon className="mr-3 h-5 w-5 flex-shrink-0" />
+          Logout
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,17 +1,13 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AssetTypesService } from '../services/asset-types.service';
-import { ApiKeyGuard } from '../../../guards/api-key.guard';
+import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import { AssetTypesListResponseDto } from '../dto/asset-types.dto';
 
 @ApiTags('Asset Types')
 @Controller('asset-types')
-@UseGuards(ApiKeyGuard)
-@ApiHeader({
-  name: 'x-api-key',
-  description: 'API key for authentication',
-  required: false,
-})
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class AssetTypesController {
   constructor(private readonly assetTypesService: AssetTypesService) {}
 

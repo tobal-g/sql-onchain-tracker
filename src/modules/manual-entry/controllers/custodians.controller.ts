@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CustodiansService } from '../services/custodians.service';
-import { ApiKeyGuard } from '../../../guards/api-key.guard';
+import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import {
   CreateCustodianDto,
   CustodiansListResponseDto,
@@ -10,12 +10,8 @@ import {
 
 @ApiTags('Custodians')
 @Controller('custodians')
-@UseGuards(ApiKeyGuard)
-@ApiHeader({
-  name: 'x-api-key',
-  description: 'API key for authentication',
-  required: false,
-})
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class CustodiansController {
   constructor(private readonly custodiansService: CustodiansService) {}
 
