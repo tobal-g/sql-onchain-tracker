@@ -77,7 +77,8 @@ describe('PortfolioService', () => {
                     balance: 28980487535.238518,
                     balanceUSD: 31298.9265380576,
                     price: 0.00000108,
-                    imgUrlV2: 'https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x262a9f4e84efa2816d87a68606bb4c1ea3874bf1.png',
+                    imgUrlV2:
+                      'https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x262a9f4e84efa2816d87a68606bb4c1ea3874bf1.png',
                     name: 'Bangkit',
                     decimals: 18,
                     balanceRaw: '28980487535238518000000000000',
@@ -111,8 +112,10 @@ describe('PortfolioService', () => {
                     balanceUSD: 23939642.91719707,
                     app: {
                       displayName: 'Lido',
-                      imgUrl: 'https://storage.googleapis.com/zapper-fi-assets/apps%2Flido.png',
-                      description: 'Simplified and secure participation in staking',
+                      imgUrl:
+                        'https://storage.googleapis.com/zapper-fi-assets/apps%2Flido.png',
+                      description:
+                        'Simplified and secure participation in staking',
                       slug: 'lido',
                       url: 'https://lido.fi/',
                       category: {
@@ -130,7 +133,8 @@ describe('PortfolioService', () => {
                         {
                           node: {
                             type: 'app-token',
-                            address: '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0',
+                            address:
+                              '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0',
                             network: 'ETHEREUM_MAINNET',
                             symbol: 'wstETH',
                             decimals: 18,
@@ -145,7 +149,8 @@ describe('PortfolioService', () => {
                             tokens: [
                               {
                                 type: 'base-token',
-                                address: '0x0000000000000000000000000000000000000000',
+                                address:
+                                  '0x0000000000000000000000000000000000000000',
                                 network: 'ETHEREUM_MAINNET',
                                 balance: 9500.536910254332,
                                 balanceUSD: 23939642.91719707,
@@ -156,7 +161,9 @@ describe('PortfolioService', () => {
                             ],
                             displayProps: {
                               label: 'wstETH',
-                              images: ['https://storage.googleapis.com/zapper-fi-assets/tokens/ethereum/0x0000000000000000000000000000000000000000.png'],
+                              images: [
+                                'https://storage.googleapis.com/zapper-fi-assets/tokens/ethereum/0x0000000000000000000000000000000000000000.png',
+                              ],
                               balanceDisplayMode: null,
                             },
                           },
@@ -188,7 +195,8 @@ describe('PortfolioService', () => {
                     token: {
                       tokenId: '10407',
                       name: 'Lil Pudgy #10407',
-                      description: 'Lil Pudgys are a collection of 22,222 randomly generated NFTs minted on Ethereum.',
+                      description:
+                        'Lil Pudgys are a collection of 22,222 randomly generated NFTs minted on Ethereum.',
                       supply: '1',
                       circulatingSupply: '1',
                       estimatedValue: {
@@ -215,11 +223,16 @@ describe('PortfolioService', () => {
                             blurhash: 'URHyw=WZ0stTN2j?xuWD0ut8^aj[?vWYIUt6',
                             height: 250,
                             width: 250,
-                            originalUri: 'https://storage.googleapis.com/zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png',
-                            original: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&checksum=VklwQoOgHYKsPj8GPZ1FDTXN8hPPSaVBjHCmiQ7vZy8',
-                            large: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=500&checksum=NlRY3lUeBcOFw3CzxcAGAQKxOLw3JhreqJ38BZTC9D0',
-                            medium: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=250&checksum=VPxH2Ejt_0dOcWCesNcsfQYZgcGYPIFERQexdytLyP0',
-                            thumbnail: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=100&checksum=BFebU_PxxIAdlqld0-cJ_M0bjMTd3qTBRdFx02pBX5M',
+                            originalUri:
+                              'https://storage.googleapis.com/zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png',
+                            original:
+                              'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&checksum=VklwQoOgHYKsPj8GPZ1FDTXN8hPPSaVBjHCmiQ7vZy8',
+                            large:
+                              'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=500&checksum=NlRY3lUeBcOFw3CzxcAGAQKxOLw3JhreqJ38BZTC9D0',
+                            medium:
+                              'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=250&checksum=VPxH2Ejt_0dOcWCesNcsfQYZgcGYPIFERQexdytLyP0',
+                            thumbnail:
+                              'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=100&checksum=BFebU_PxxIAdlqld0-cJ_M0bjMTd3qTBRdFx02pBX5M',
                             predominantColor: '#9ab3ed',
                           },
                         },
@@ -231,14 +244,20 @@ describe('PortfolioService', () => {
                               node: {
                                 mimeType: 'image/png',
                                 fileSize: 181886,
-                                blurhash: 'UPQ4c{$j_$+^{0n%CRX8s;jtS0bFtlbHv#n%',
+                                blurhash:
+                                  'UPQ4c{$j_$+^{0n%CRX8s;jtS0bFtlbHv#n%',
                                 height: 2700,
                                 width: 2700,
-                                originalUri: 'https://api.pudgypenguins.io/lil/image/10407',
-                                original: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&checksum=fRHieiOCQj_0piw8VZc-HDP-f5Uy8cl4p99Dx-66ycM',
-                                thumbnail: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=100&checksum=oDAXzMIzWvlGOLbb1nN8IWKl4_B26B840wd6CXwhSWw',
-                                medium: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=250&checksum=jiyBP_I0JxBPasrg273qHzkTPOfnzRyMCdHakPTV-vk',
-                                large: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=500&checksum=Ndb7k_Uoscl4oQ8vjoCCLljQcDG7BvtTV-SQ6w6JDRM',
+                                originalUri:
+                                  'https://api.pudgypenguins.io/lil/image/10407',
+                                original:
+                                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&checksum=fRHieiOCQj_0piw8VZc-HDP-f5Uy8cl4p99Dx-66ycM',
+                                thumbnail:
+                                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=100&checksum=oDAXzMIzWvlGOLbb1nN8IWKl4_B26B840wd6CXwhSWw',
+                                medium:
+                                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=250&checksum=jiyBP_I0JxBPasrg273qHzkTPOfnzRyMCdHakPTV-vk',
+                                large:
+                                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=500&checksum=Ndb7k_Uoscl4oQ8vjoCCLljQcDG7BvtTV-SQ6w6JDRM',
                                 predominantColor: '#e35063',
                               },
                             },
@@ -330,7 +349,8 @@ describe('PortfolioService', () => {
                   node: {
                     app: {
                       displayName: 'Uniswap V3',
-                      imgUrl: 'https://storage.googleapis.com/zapper-fi-assets/apps%2Funiswap-v3.png',
+                      imgUrl:
+                        'https://storage.googleapis.com/zapper-fi-assets/apps%2Funiswap-v3.png',
                       description: 'Uniswap V3',
                       slug: 'uniswap-v3',
                       url: 'https://uniswap.org/',
@@ -348,14 +368,16 @@ describe('PortfolioService', () => {
                       edges: [
                         {
                           node: {
-                            address: '0x03a520b32c04bf3beef7beb72e919cf822ed34f1',
+                            address:
+                              '0x03a520b32c04bf3beef7beb72e919cf822ed34f1',
                             balanceUSD: 290.2802431386432,
                             tokens: [
                               {
                                 metaType: 'CLAIMABLE',
                                 token: {
                                   type: 'base-token',
-                                  address: '0x4200000000000000000000000000000000000006',
+                                  address:
+                                    '0x4200000000000000000000000000000000000006',
                                   network: 'BASE_MAINNET',
                                   balance: 0.022992034771408265,
                                   balanceUSD: 43.06247168441369,
@@ -367,7 +389,9 @@ describe('PortfolioService', () => {
                             ],
                             displayProps: {
                               label: '⌘ / WETH (Token ID: 1568607)',
-                              images: ['https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x4200000000000000000000000000000000000006.png'],
+                              images: [
+                                'https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x4200000000000000000000000000000000000006.png',
+                              ],
                               balanceDisplayMode: null,
                             },
                           },
@@ -416,8 +440,10 @@ describe('PortfolioService', () => {
 
   beforeEach(async () => {
     // Create fresh mocks for each test
-    mockCacheManager = createMockCacheManager() as unknown as jest.Mocked<Cache>;
-    mockConfigService = createMockConfigService() as unknown as jest.Mocked<ConfigService>;
+    mockCacheManager =
+      createMockCacheManager() as unknown as jest.Mocked<Cache>;
+    mockConfigService =
+      createMockConfigService() as unknown as jest.Mocked<ConfigService>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -476,7 +502,7 @@ describe('PortfolioService', () => {
         expect.objectContaining({
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'x-zapper-api-key': 'test-api-key',
           }),
           timeout: 30000,
@@ -526,7 +552,9 @@ describe('PortfolioService', () => {
     });
 
     it('should throw an error for invalid address', async () => {
-      await expect(service.getTokenBalances(invalidAddress, {})).rejects.toThrow(
+      await expect(
+        service.getTokenBalances(invalidAddress, {}),
+      ).rejects.toThrow(
         new HttpException('Invalid address format', HttpStatus.BAD_REQUEST),
       );
 
@@ -543,7 +571,10 @@ describe('PortfolioService', () => {
       mockedAxios.post.mockResolvedValueOnce(errorResponse);
 
       await expect(service.getTokenBalances(validAddress, {})).rejects.toThrow(
-        new HttpException('GraphQL errors: GraphQL error', HttpStatus.BAD_REQUEST),
+        new HttpException(
+          'GraphQL errors: GraphQL error',
+          HttpStatus.BAD_REQUEST,
+        ),
       );
     });
 
@@ -551,7 +582,10 @@ describe('PortfolioService', () => {
       mockedAxios.post.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(service.getTokenBalances(validAddress, {})).rejects.toThrow(
-        new HttpException('Failed to fetch portfolio data', HttpStatus.INTERNAL_SERVER_ERROR),
+        new HttpException(
+          'Failed to fetch portfolio data',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
       );
     });
   });
@@ -622,7 +656,9 @@ describe('PortfolioService', () => {
     });
 
     it('should throw an error for invalid address', async () => {
-      await expect(service.getPortfolioTotals(invalidAddress, {})).rejects.toThrow(
+      await expect(
+        service.getPortfolioTotals(invalidAddress, {}),
+      ).rejects.toThrow(
         new HttpException('Invalid address format', HttpStatus.BAD_REQUEST),
       );
     });
@@ -639,7 +675,9 @@ describe('PortfolioService', () => {
       expect(result.claimables).toHaveLength(1);
       expect(result.claimables[0].app.displayName).toBe('Uniswap V3');
       expect(result.claimables[0].claimableTokens).toHaveLength(1);
-      expect(result.claimables[0].claimableTokens[0].metaType).toBe('CLAIMABLE');
+      expect(result.claimables[0].claimableTokens[0].metaType).toBe(
+        'CLAIMABLE',
+      );
 
       // Verify caching
       expect(mockCacheManager.set).toHaveBeenCalled();
@@ -692,7 +730,9 @@ describe('PortfolioService', () => {
     });
 
     it('should throw an error for invalid address', async () => {
-      await expect(service.getMetaTypeBreakdown(invalidAddress, {})).rejects.toThrow(
+      await expect(
+        service.getMetaTypeBreakdown(invalidAddress, {}),
+      ).rejects.toThrow(
         new HttpException('Invalid address format', HttpStatus.BAD_REQUEST),
       );
     });
@@ -709,7 +749,9 @@ describe('PortfolioService', () => {
       mockedAxios.post.mockResolvedValue(mockTokenBalancesResponse);
 
       for (const address of validAddresses) {
-        await expect(service.getTokenBalances(address, {})).resolves.toBeDefined();
+        await expect(
+          service.getTokenBalances(address, {}),
+        ).resolves.toBeDefined();
       }
     });
 
@@ -739,7 +781,10 @@ describe('PortfolioService', () => {
       mockedAxios.post.mockRejectedValueOnce(error);
 
       await expect(service.getTokenBalances(validAddress, {})).rejects.toThrow(
-        new HttpException('Invalid address or parameters', HttpStatus.BAD_REQUEST),
+        new HttpException(
+          'Invalid address or parameters',
+          HttpStatus.BAD_REQUEST,
+        ),
       );
     });
 
@@ -751,7 +796,10 @@ describe('PortfolioService', () => {
       mockedAxios.post.mockRejectedValueOnce(error);
 
       await expect(service.getTokenBalances(validAddress, {})).rejects.toThrow(
-        new HttpException('Zapper API endpoint not found. Please check the API URL configuration.', HttpStatus.NOT_FOUND),
+        new HttpException(
+          'Zapper API endpoint not found. Please check the API URL configuration.',
+          HttpStatus.NOT_FOUND,
+        ),
       );
     });
 
@@ -763,7 +811,10 @@ describe('PortfolioService', () => {
       mockedAxios.post.mockRejectedValueOnce(error);
 
       await expect(service.getTokenBalances(validAddress, {})).rejects.toThrow(
-        new HttpException('Failed to fetch portfolio data', HttpStatus.INTERNAL_SERVER_ERROR),
+        new HttpException(
+          'Failed to fetch portfolio data',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
       );
     });
   });

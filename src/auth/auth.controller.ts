@@ -47,9 +47,8 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
-    const { accessToken, refreshToken, expiresIn } = await this.authService.login(
-      dto.password,
-    );
+    const { accessToken, refreshToken, expiresIn } =
+      await this.authService.login(dto.password);
 
     // Set refresh token as httpOnly cookie
     this.setRefreshTokenCookie(res, refreshToken);
@@ -76,8 +75,11 @@ export class AuthController {
       throw new UnauthorizedException('No refresh token provided');
     }
 
-    const { accessToken, refreshToken: newRefreshToken, expiresIn } =
-      await this.authService.refresh(refreshToken);
+    const {
+      accessToken,
+      refreshToken: newRefreshToken,
+      expiresIn,
+    } = await this.authService.refresh(refreshToken);
 
     // Rotate refresh token
     this.setRefreshTokenCookie(res, newRefreshToken);

@@ -1,4 +1,9 @@
-import { Injectable, Inject, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { Pool } from 'pg';
 import { DATABASE_POOL } from '../../database/database.module';
 import {
@@ -49,8 +54,10 @@ export class YahooFinanceService {
    */
   async getCclRate(): Promise<number> {
     try {
-      const response = await fetch('https://dolarapi.com/v1/dolares/contadoconliqui');
-      
+      const response = await fetch(
+        'https://dolarapi.com/v1/dolares/contadoconliqui',
+      );
+
       if (!response.ok) {
         throw new Error(`DolarAPI returned ${response.status}`);
       }
@@ -65,7 +72,10 @@ export class YahooFinanceService {
       this.logger.log(`Fetched CCL rate: ${ventaRate} ARS/USD`);
       return ventaRate;
     } catch (error) {
-      this.logger.error(`Failed to fetch CCL rate: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to fetch CCL rate: ${error.message}`,
+        error.stack,
+      );
       throw new ServiceUnavailableException(
         `Cannot fetch CCL rate from DolarAPI: ${error.message}`,
       );
@@ -84,10 +94,15 @@ export class YahooFinanceService {
 
     try {
       const result = await this.pool.query(query);
-      this.logger.log(`Found ${result.rows.length} assets to sync via Yahoo Finance`);
+      this.logger.log(
+        `Found ${result.rows.length} assets to sync via Yahoo Finance`,
+      );
       return result.rows;
     } catch (error) {
-      this.logger.error(`Failed to fetch assets: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to fetch assets: ${error.message}`,
+        error.stack,
+      );
       throw new Error(`Failed to fetch assets from database: ${error.message}`);
     }
   }
@@ -98,7 +113,9 @@ export class YahooFinanceService {
    */
   async fetchPrice(ticker: string): Promise<number | null> {
     try {
-      const quote = await this.yahooFinance.quote(ticker) as { regularMarketPrice?: number };
+      const quote = (await this.yahooFinance.quote(ticker)) as {
+        regularMarketPrice?: number;
+      };
       const price = quote?.regularMarketPrice;
 
       if (typeof price !== 'number' || price <= 0) {

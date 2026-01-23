@@ -92,7 +92,9 @@ export class PositionsService {
     return { positions, total_value_usd };
   }
 
-  async upsertPosition(dto: UpsertPositionDto): Promise<UpsertPositionResponseDto> {
+  async upsertPosition(
+    dto: UpsertPositionDto,
+  ): Promise<UpsertPositionResponseDto> {
     // Resolve asset_id
     let assetId = dto.asset_id;
     if (!assetId && dto.asset_symbol) {
@@ -184,7 +186,9 @@ export class PositionsService {
     return { success: true, deleted_id: id };
   }
 
-  async quickCashUpdate(dto: QuickCashUpdateDto): Promise<UpsertPositionResponseDto> {
+  async quickCashUpdate(
+    dto: QuickCashUpdateDto,
+  ): Promise<UpsertPositionResponseDto> {
     // Find or validate the cash asset
     const assetResult = await this.pool.query(
       'SELECT id FROM assets WHERE LOWER(symbol) = LOWER($1)',
@@ -220,7 +224,9 @@ export class PositionsService {
    * the asset uses Zapper as the price source.
    * Used by sync to identify which positions to zero if not found in Zapper response.
    */
-  async getZapperAssetIdsForCustodian(custodianId: number): Promise<Set<number>> {
+  async getZapperAssetIdsForCustodian(
+    custodianId: number,
+  ): Promise<Set<number>> {
     const query = `
       SELECT p.asset_id
       FROM positions p
@@ -230,7 +236,7 @@ export class PositionsService {
         AND p.quantity > 0
     `;
     const result = await this.pool.query(query, [custodianId]);
-    return new Set(result.rows.map(row => row.asset_id));
+    return new Set(result.rows.map((row) => row.asset_id));
   }
 
   /**
@@ -238,7 +244,9 @@ export class PositionsService {
    * the asset uses Zerion as the price source.
    * Used by sync to identify which positions to zero if not found in Zerion response.
    */
-  async getZerionAssetIdsForCustodian(custodianId: number): Promise<Set<number>> {
+  async getZerionAssetIdsForCustodian(
+    custodianId: number,
+  ): Promise<Set<number>> {
     const query = `
       SELECT p.asset_id
       FROM positions p
@@ -248,6 +256,6 @@ export class PositionsService {
         AND p.quantity > 0
     `;
     const result = await this.pool.query(query, [custodianId]);
-    return new Set(result.rows.map(row => row.asset_id));
+    return new Set(result.rows.map((row) => row.asset_id));
   }
 }

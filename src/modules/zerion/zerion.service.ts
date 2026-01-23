@@ -31,6 +31,29 @@ export class ZerionService {
   }
 
   /**
+   * Extracts the token address from a Zerion position, matching the position's chain.
+   * Zerion's implementations array is sorted alphabetically by chain_id, so we need
+   * to find the implementation matching the position's actual chain rather than taking [0].
+   *
+   * @param position - The raw Zerion position object
+   * @returns The token address for the position's chain, or undefined if not found
+   */
+  private extractTokenAddress(position: any): string | undefined {
+    const implementations =
+      position?.attributes?.fungible_info?.implementations || [];
+    const chainId = position?.relationships?.chain?.data?.id;
+
+    // Find implementation matching the position's chain
+    const matchingImpl = chainId
+      ? implementations.find((impl: any) => impl.chain_id === chainId)
+      : null;
+
+    // Use matching implementation, or fall back to [0] for single-chain tokens
+    const address = matchingImpl?.address || implementations[0]?.address;
+    return address?.toLowerCase();
+  }
+
+  /**
    * Fetches the current price for a token from Zerion API.
    * Uses the /wallets/{address}/positions/ endpoint to find the token price,
    * since some tokens (like SKY) are not indexed in /fungibles but exist in positions.
@@ -73,14 +96,14 @@ export class ZerionService {
 
       // Find the position matching our token address
       for (const position of positions) {
-        const fungibleAddress =
-          position?.attributes?.fungible_info?.implementations?.[0]?.address?.toLowerCase();
+        const fungibleAddress = this.extractTokenAddress(position);
 
         if (fungibleAddress === normalizedTokenAddress) {
           const price = position?.attributes?.price;
 
           if (typeof price === 'number' && price > 0) {
-            const symbol = position?.attributes?.fungible_info?.symbol || 'unknown';
+            const symbol =
+              position?.attributes?.fungible_info?.symbol || 'unknown';
             this.logger.debug(`Zerion price for ${symbol}: $${price}`);
             return price;
           }
@@ -137,14 +160,18 @@ export class ZerionService {
       const positions: ZerionPosition[] = [];
 
       for (const position of rawPositions) {
-        const tokenAddress =
-          position?.attributes?.fungible_info?.implementations?.[0]?.address?.toLowerCase();
+        const tokenAddress = this.extractTokenAddress(position);
         const symbol = position?.attributes?.fungible_info?.symbol;
         const quantity = position?.attributes?.quantity?.float;
         const price = position?.attributes?.price;
 
         // Only include positions with valid data
-        if (tokenAddress && symbol && typeof quantity === 'number' && quantity > 0) {
+        if (
+          tokenAddress &&
+          symbol &&
+          typeof quantity === 'number' &&
+          quantity > 0
+        ) {
           positions.push({
             tokenAddress,
             symbol,

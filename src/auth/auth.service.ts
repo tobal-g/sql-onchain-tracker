@@ -137,7 +137,9 @@ export class AuthService implements OnModuleInit {
       type: 'access',
     };
 
-    return this.jwtService.sign(payload, { expiresIn: this.accessExpirySeconds });
+    return this.jwtService.sign(payload, {
+      expiresIn: this.accessExpirySeconds,
+    });
   }
 
   private generateRefreshToken(): string {
@@ -146,6 +148,8 @@ export class AuthService implements OnModuleInit {
       type: 'refresh',
     };
 
-    return this.jwtService.sign(payload, { expiresIn: this.refreshExpirySeconds });
+    return this.jwtService.sign(payload, {
+      expiresIn: this.refreshExpirySeconds,
+    });
   }
 }

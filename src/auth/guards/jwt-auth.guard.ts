@@ -18,7 +18,8 @@ export class JwtAuthGuard implements CanActivate {
     private readonly configService: ConfigService,
   ) {
     // Auth is required only if AUTH_PASSWORD_HASH is configured
-    this.isAuthRequired = !!this.configService.get<string>('AUTH_PASSWORD_HASH');
+    this.isAuthRequired =
+      !!this.configService.get<string>('AUTH_PASSWORD_HASH');
 
     if (!this.isAuthRequired) {
       this.logger.warn(

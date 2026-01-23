@@ -167,7 +167,9 @@ export class AppTokenPositionBalanceDto {
 }
 
 export class TokenWithMetaTypeDto {
-  @ApiProperty({ enum: ['SUPPLIED', 'BORROWED', 'CLAIMABLE', 'VESTING', 'LOCKED'] })
+  @ApiProperty({
+    enum: ['SUPPLIED', 'BORROWED', 'CLAIMABLE', 'VESTING', 'LOCKED'],
+  })
   metaType: 'SUPPLIED' | 'BORROWED' | 'CLAIMABLE' | 'VESTING' | 'LOCKED';
 
   @ApiProperty()
@@ -424,10 +426,10 @@ export class PortfolioQueryDto {
   @IsArray()
   @Transform(({ value }) => {
     if (typeof value === 'string') {
-      return value.split(',').map(v => parseInt(v.trim(), 10));
+      return value.split(',').map((v) => parseInt(v.trim(), 10));
     }
     if (Array.isArray(value)) {
-      return value.map(v => parseInt(v, 10));
+      return value.map((v) => parseInt(v, 10));
     }
     return value;
   })
@@ -448,7 +450,17 @@ export class PortfolioQueryDto {
 
 // Meta Type Breakdown DTOs
 export class MetaTypeBreakdownDto {
-  @ApiProperty({ enum: ['SUPPLIED', 'BORROWED', 'CLAIMABLE', 'VESTING', 'LOCKED', 'NFT', 'WALLET'] })
+  @ApiProperty({
+    enum: [
+      'SUPPLIED',
+      'BORROWED',
+      'CLAIMABLE',
+      'VESTING',
+      'LOCKED',
+      'NFT',
+      'WALLET',
+    ],
+  })
   metaType: string;
 
   @ApiProperty()
@@ -464,4 +476,4 @@ export class MetaTypeBreakdownsDto {
 
   @ApiProperty()
   totalCount: number;
-} 
+}

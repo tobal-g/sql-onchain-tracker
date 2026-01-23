@@ -1,13 +1,25 @@
+import { useMemo } from 'react';
 import { usePortfolioSummary, usePositions } from '../hooks/usePortfolio';
-import { formatCurrency, formatPercent, formatQuantity } from '../utils/format';
+import { formatCurrency, formatPercent } from '../utils/format';
+import { aggregatePositionsByAsset, groupAssetsByType } from '../utils/aggregation';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis } from 'recharts';
+import GroupedAssetCards from '../components/positions/GroupedAssetCards';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
 
 export default function Dashboard() {
   const { data: summary, isLoading: summaryLoading, error: summaryError } = usePortfolioSummary();
   const { data: positions, isLoading: positionsLoading } = usePositions();
+
+  // Aggregate positions by asset and group by type
+  // Must be called before any early returns to follow Rules of Hooks
+  const { aggregatedAssets, groupedAssets } = useMemo(() => {
+    if (!positions?.positions || !summary) return { aggregatedAssets: [], groupedAssets: [] };
+    const aggregated = aggregatePositionsByAsset(positions.positions, summary.total_value_usd);
+    const grouped = groupAssetsByType(aggregated, summary.total_value_usd);
+    return { aggregatedAssets: aggregated, groupedAssets: grouped };
+  }, [positions, summary]);
 
   if (summaryLoading || positionsLoading) {
     return (
@@ -45,10 +57,11 @@ export default function Dashboard() {
     color: COLORS[index % COLORS.length],
   }));
 
-  const topHoldingsBarData = summary.top_holdings.slice(0, 6).map((item) => ({
+  const assetPieData = aggregatedAssets.slice(0, 8).map((item, index) => ({
     name: item.symbol,
-    value: item.value_usd,
+    value: item.totalValueUsd,
     percentage: item.percentage,
+    color: COLORS[index % COLORS.length],
   }));
 
   return (
@@ -89,20 +102,20 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Charts Row */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Charts Row - 3 Pie Charts */}
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {/* Allocation by Type */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900">Allocation by Type</h2>
-          <div className="mt-4 h-64">
+          <h2 className="text-lg font-semibold text-gray-900">By Type</h2>
+          <div className="mt-4 h-56">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={assetTypePieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
+                  innerRadius={45}
+                  outerRadius={70}
                   paddingAngle={2}
                   dataKey="value"
                 >
@@ -110,9 +123,7 @@ export default function Dashboard() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip
-                  formatter={(value) => formatCurrency(Number(value))}
-                />
+                <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -136,18 +147,61 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Allocation by Custodian */}
+        {/* Allocation by Asset */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900">Allocation by Custodian</h2>
-          <div className="mt-4 h-64">
+          <h2 className="text-lg font-semibold text-gray-900">By Asset</h2>
+          <div className="mt-4 h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={assetPieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={45}
+                  outerRadius={70}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {assetPieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-4 space-y-2 max-h-32 overflow-y-auto">
+            {aggregatedAssets.slice(0, 6).map((item, index) => (
+              <div key={item.symbol} className="flex items-center justify-between text-sm">
+                <div className="flex items-center">
+                  <div
+                    className="mr-2 h-3 w-3 rounded-full"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span>{item.symbol}</span>
+                </div>
+                <div className="text-right">
+                  <span className="font-medium">{formatCurrency(item.totalValueUsd)}</span>
+                  <span className="ml-2 text-gray-500">({formatPercent(item.percentage)})</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Allocation by Custodian */}
+        <div className="card md:col-span-2 xl:col-span-1">
+          <h2 className="text-lg font-semibold text-gray-900">By Custodian</h2>
+          <div className="mt-4 h-56">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={custodianPieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
+                  innerRadius={45}
+                  outerRadius={70}
                   paddingAngle={2}
                   dataKey="value"
                 >
@@ -182,75 +236,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Top Holdings Bar Chart */}
-      <div className="card">
-        <h2 className="text-lg font-semibold text-gray-900">Top Holdings</h2>
-        <div className="mt-4 h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={topHoldingsBarData} layout="vertical">
-              <XAxis type="number" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
-              <YAxis type="category" dataKey="name" width={60} />
-              <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-              <Bar dataKey="value" fill="#3B82F6" radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Holdings Table */}
-      <div className="card">
-        <h2 className="text-lg font-semibold text-gray-900">All Positions</h2>
-        <div className="mt-4 overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Asset
-                </th>
-                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 sm:table-cell">
-                  Custodian
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Quantity
-                </th>
-                <th className="hidden px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 md:table-cell">
-                  Price
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Value
-                </th>
-                <th className="hidden px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 lg:table-cell">
-                  %
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {positions?.positions.slice(0, 15).map((position) => (
-                <tr key={position.id} className="hover:bg-gray-50">
-                  <td className="whitespace-nowrap px-4 py-3">
-                    <div className="font-medium text-gray-900">{position.asset.symbol}</div>
-                    <div className="text-sm text-gray-500 sm:hidden">{position.custodian.name}</div>
-                  </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-gray-500 sm:table-cell">
-                    {position.custodian.name}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right text-gray-900">
-                    {formatQuantity(position.quantity)}
-                  </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-right text-gray-900 md:table-cell">
-                    {formatCurrency(position.current_price)}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-gray-900">
-                    {formatCurrency(position.value_usd)}
-                  </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-right text-gray-500 lg:table-cell">
-                    {formatPercent((position.value_usd / summary.total_value_usd) * 100)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Holdings by Asset Type */}
+      <div>
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">Holdings by Asset</h2>
+        <GroupedAssetCards groupedAssets={groupedAssets} />
       </div>
     </div>
   );

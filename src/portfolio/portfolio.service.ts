@@ -1,4 +1,10 @@
-import { Injectable, HttpException, HttpStatus, Logger, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -24,12 +30,17 @@ export class PortfolioService {
     private readonly configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
-    this.zapperGraphQLUrl = this.configService.get<string>('ZAPPER_API_URL', 'https://public.zapper.xyz/graphql');
+    this.zapperGraphQLUrl = this.configService.get<string>(
+      'ZAPPER_API_URL',
+      'https://public.zapper.xyz/graphql',
+    );
     this.zapperApiKey = this.configService.get<string>('ZAPPER_API_KEY');
     this.cacheTtl = this.configService.get<number>('CACHE_TTL', 90) * 1000; // Convert to milliseconds
 
     if (!this.zapperApiKey) {
-      this.logger.warn('ZAPPER_API_KEY not configured. Using public endpoint without authentication.');
+      this.logger.warn(
+        'ZAPPER_API_KEY not configured. Using public endpoint without authentication.',
+      );
     }
   }
 
@@ -429,16 +440,23 @@ export class PortfolioService {
     }
   `;
 
-  private generateCacheKey(method: string, address: string, params: any): string {
+  private generateCacheKey(
+    method: string,
+    address: string,
+    params: any,
+  ): string {
     const paramString = JSON.stringify(params);
     return `portfolio:${method}:${address}:${Buffer.from(paramString).toString('base64')}`;
   }
 
-  private async executeGraphQLQuery(query: string, variables: any): Promise<any> {
+  private async executeGraphQLQuery(
+    query: string,
+    variables: any,
+  ): Promise<any> {
     try {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       };
 
       // Add API key if available
@@ -458,13 +476,13 @@ export class PortfolioService {
         {
           headers,
           timeout: 30000, // 30 second timeout
-        }
+        },
       );
 
       if (response.data.errors) {
         this.logger.error('GraphQL errors:', response.data.errors);
         throw new HttpException(
-          `GraphQL errors: ${response.data.errors.map(e => e.message).join(', ')}`,
+          `GraphQL errors: ${response.data.errors.map((e) => e.message).join(', ')}`,
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -475,7 +493,7 @@ export class PortfolioService {
       if (error instanceof HttpException) {
         throw error;
       }
-      
+
       this.logger.error('GraphQL request failed:', error.message);
       if (error.response?.status === 400) {
         throw new HttpException(
@@ -516,8 +534,12 @@ export class PortfolioService {
       throw new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
     }
 
-    const cacheKey = this.generateCacheKey('tokenBalances', address, queryParams);
-    
+    const cacheKey = this.generateCacheKey(
+      'tokenBalances',
+      address,
+      queryParams,
+    );
+
     // Try to get from cache first
     try {
       const cached = await this.cacheManager.get<TokenBalancesDto>(cacheKey);
@@ -535,7 +557,10 @@ export class PortfolioService {
       chainIds: queryParams.chainIds,
     };
 
-    const data = await this.executeGraphQLQuery(this.TOKEN_BALANCES_QUERY, variables);
+    const data = await this.executeGraphQLQuery(
+      this.TOKEN_BALANCES_QUERY,
+      variables,
+    );
     const tokenBalances = data.portfolioV2.tokenBalances;
 
     const result: TokenBalancesDto = {
@@ -567,7 +592,7 @@ export class PortfolioService {
     }
 
     const cacheKey = this.generateCacheKey('appBalances', address, queryParams);
-    
+
     // Try to get from cache first
     try {
       const cached = await this.cacheManager.get<AppBalancesDto>(cacheKey);
@@ -585,7 +610,10 @@ export class PortfolioService {
       chainIds: queryParams.chainIds,
     };
 
-    const data = await this.executeGraphQLQuery(this.APP_BALANCES_QUERY, variables);
+    const data = await this.executeGraphQLQuery(
+      this.APP_BALANCES_QUERY,
+      variables,
+    );
     const appBalances = data.portfolioV2.appBalances;
 
     const result: AppBalancesDto = {
@@ -594,7 +622,9 @@ export class PortfolioService {
         balanceUSD: edge.node.balanceUSD,
         app: edge.node.app,
         network: edge.node.network,
-        positionBalances: edge.node.positionBalances.edges.map((posEdge: any) => posEdge.node),
+        positionBalances: edge.node.positionBalances.edges.map(
+          (posEdge: any) => posEdge.node,
+        ),
       })),
     };
 
@@ -618,7 +648,7 @@ export class PortfolioService {
     }
 
     const cacheKey = this.generateCacheKey('nftBalances', address, queryParams);
-    
+
     // Try to get from cache first
     try {
       const cached = await this.cacheManager.get<NFTBalancesDto>(cacheKey);
@@ -638,7 +668,10 @@ export class PortfolioService {
       // Note: NFT queries don't support minBalanceUSD filter, only hidden/chainId/collections
     };
 
-    const data = await this.executeGraphQLQuery(this.NFT_BALANCES_QUERY, variables);
+    const data = await this.executeGraphQLQuery(
+      this.NFT_BALANCES_QUERY,
+      variables,
+    );
     const nftBalances = data.portfolioV2.nftBalances;
 
     const result: NFTBalancesDto = {
@@ -669,8 +702,12 @@ export class PortfolioService {
       throw new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
     }
 
-    const cacheKey = this.generateCacheKey('portfolioTotals', address, queryParams);
-    
+    const cacheKey = this.generateCacheKey(
+      'portfolioTotals',
+      address,
+      queryParams,
+    );
+
     // Try to get from cache first
     try {
       const cached = await this.cacheManager.get<PortfolioTotalsDto>(cacheKey);
@@ -688,7 +725,10 @@ export class PortfolioService {
       chainIds: queryParams.chainIds,
     };
 
-    const data = await this.executeGraphQLQuery(this.PORTFOLIO_TOTALS_QUERY, variables);
+    const data = await this.executeGraphQLQuery(
+      this.PORTFOLIO_TOTALS_QUERY,
+      variables,
+    );
     const portfolio = data.portfolioV2;
 
     const tokenTotalUSD = portfolio.tokenBalances.totalBalanceUSD;
@@ -740,7 +780,7 @@ export class PortfolioService {
     }
 
     const cacheKey = this.generateCacheKey('claimables', address, queryParams);
-    
+
     // Try to get from cache first
     try {
       const cached = await this.cacheManager.get<ClaimablesDto>(cacheKey);
@@ -757,7 +797,10 @@ export class PortfolioService {
       chainIds: queryParams.chainIds,
     };
 
-    const data = await this.executeGraphQLQuery(this.CLAIMABLES_QUERY, variables);
+    const data = await this.executeGraphQLQuery(
+      this.CLAIMABLES_QUERY,
+      variables,
+    );
     const appBalances = data.portfolioV2.appBalances;
 
     const claimables: any[] = [];
@@ -766,16 +809,17 @@ export class PortfolioService {
     appBalances.byApp.edges.forEach((appEdge: any) => {
       appEdge.node.balances.edges.forEach((balanceEdge: any) => {
         const position = balanceEdge.node;
-        const claimableTokens = position.tokens?.filter((token: any) => 
-          token.metaType === 'CLAIMABLE'
-        ) || [];
+        const claimableTokens =
+          position.tokens?.filter(
+            (token: any) => token.metaType === 'CLAIMABLE',
+          ) || [];
 
         if (claimableTokens.length > 0) {
           const claimableUSD = claimableTokens.reduce(
             (sum: number, token: any) => sum + (token.token.balanceUSD || 0),
-            0
+            0,
           );
-          
+
           totalClaimableUSD += claimableUSD;
 
           claimables.push({
@@ -814,11 +858,16 @@ export class PortfolioService {
       throw new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
     }
 
-    const cacheKey = this.generateCacheKey('metaTypeBreakdown', address, queryParams);
-    
+    const cacheKey = this.generateCacheKey(
+      'metaTypeBreakdown',
+      address,
+      queryParams,
+    );
+
     // Try to get from cache first
     try {
-      const cached = await this.cacheManager.get<MetaTypeBreakdownsDto>(cacheKey);
+      const cached =
+        await this.cacheManager.get<MetaTypeBreakdownsDto>(cacheKey);
       if (cached) {
         this.logger.debug(`Cache hit for meta type breakdown: ${address}`);
         return cached;
@@ -833,7 +882,10 @@ export class PortfolioService {
       chainIds: queryParams.chainIds,
     };
 
-    const data = await this.executeGraphQLQuery(this.META_TYPE_BREAKDOWN_QUERY, variables);
+    const data = await this.executeGraphQLQuery(
+      this.META_TYPE_BREAKDOWN_QUERY,
+      variables,
+    );
     const breakdown = data.portfolioV2.appBalances.byMetaType;
 
     const result: MetaTypeBreakdownsDto = {

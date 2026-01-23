@@ -116,7 +116,9 @@ export class TransactionsService {
 
       // Determine quantity delta for position update
       let quantityDelta = dto.quantity;
-      if (['sell', 'transfer_out', 'withdrawal'].includes(dto.transaction_type)) {
+      if (
+        ['sell', 'transfer_out', 'withdrawal'].includes(dto.transaction_type)
+      ) {
         quantityDelta = -dto.quantity;
       }
 

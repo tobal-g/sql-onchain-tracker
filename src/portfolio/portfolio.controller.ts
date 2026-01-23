@@ -1,5 +1,18 @@
-import { Controller, Get, Param, Query, HttpException, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { PortfolioService } from './portfolio.service';
 import {
   TokenBalancesDto,
@@ -19,7 +32,8 @@ export class PortfolioController {
   @Get(':address/tokens')
   @ApiOperation({
     summary: 'Get token balances for an address',
-    description: 'Retrieve all token balances across different networks with real-time USD values',
+    description:
+      'Retrieve all token balances across different networks with real-time USD values',
   })
   @ApiParam({
     name: 'address',
@@ -30,7 +44,8 @@ export class PortfolioController {
     name: 'chainIds',
     required: false,
     type: [Number],
-    description: 'Array of chain IDs to filter by (e.g., [1, 8453] for Ethereum and Base)',
+    description:
+      'Array of chain IDs to filter by (e.g., [1, 8453] for Ethereum and Base)',
     example: [8453],
   })
   @ApiQuery({
@@ -70,7 +85,8 @@ export class PortfolioController {
   @Get(':address/apps')
   @ApiOperation({
     summary: 'Get app balances for an address',
-    description: 'Retrieve positions within onchain applications like lending protocols, DEXes, etc.',
+    description:
+      'Retrieve positions within onchain applications like lending protocols, DEXes, etc.',
   })
   @ApiParam({
     name: 'address',
@@ -114,7 +130,8 @@ export class PortfolioController {
   @Get(':address/nfts')
   @ApiOperation({
     summary: 'Get NFT balances for an address',
-    description: 'Get all NFTs held by address with complete metadata, estimated USD valuations, and flexible filters',
+    description:
+      'Get all NFTs held by address with complete metadata, estimated USD valuations, and flexible filters',
   })
   @ApiParam({
     name: 'address',
@@ -165,7 +182,8 @@ export class PortfolioController {
   @Get(':address/totals')
   @ApiOperation({
     summary: 'Get portfolio totals for an address',
-    description: 'Get aggregated portfolio values and breakdowns across tokens, apps, and NFTs',
+    description:
+      'Get aggregated portfolio values and breakdowns across tokens, apps, and NFTs',
   })
   @ApiParam({
     name: 'address',
@@ -209,7 +227,8 @@ export class PortfolioController {
   @Get(':address/claimables')
   @ApiOperation({
     summary: 'Get claimable tokens for an address',
-    description: 'Retrieve tokens that can be claimed as rewards, airdrops, etc. from DeFi protocols',
+    description:
+      'Retrieve tokens that can be claimed as rewards, airdrops, etc. from DeFi protocols',
   })
   @ApiParam({
     name: 'address',
@@ -246,7 +265,8 @@ export class PortfolioController {
   @Get(':address/breakdown')
   @ApiOperation({
     summary: 'Get meta type breakdown for an address',
-    description: 'Get total balances by position type (SUPPLIED, BORROWED, CLAIMABLE, etc.)',
+    description:
+      'Get total balances by position type (SUPPLIED, BORROWED, CLAIMABLE, etc.)',
   })
   @ApiParam({
     name: 'address',
@@ -284,13 +304,17 @@ export class PortfolioController {
     @Param('address') address: string,
     @Query() queryParams: PortfolioQueryDto,
   ): Promise<MetaTypeBreakdownsDto> {
-    return await this.portfolioService.getMetaTypeBreakdown(address, queryParams);
+    return await this.portfolioService.getMetaTypeBreakdown(
+      address,
+      queryParams,
+    );
   }
 
   @Get(':address')
   @ApiOperation({
     summary: 'Get complete portfolio overview for an address',
-    description: 'Get a comprehensive overview including tokens, apps, NFTs, and totals',
+    description:
+      'Get a comprehensive overview including tokens, apps, NFTs, and totals',
   })
   @ApiParam({
     name: 'address',
@@ -354,14 +378,15 @@ export class PortfolioController {
   }> {
     try {
       // Execute all queries in parallel for better performance
-      const [tokens, apps, nfts, totals, claimables, breakdown] = await Promise.all([
-        this.portfolioService.getTokenBalances(address, queryParams),
-        this.portfolioService.getAppBalances(address, queryParams),
-        this.portfolioService.getNFTBalances(address, queryParams),
-        this.portfolioService.getPortfolioTotals(address, queryParams),
-        this.portfolioService.getClaimables(address, queryParams),
-        this.portfolioService.getMetaTypeBreakdown(address, queryParams),
-      ]);
+      const [tokens, apps, nfts, totals, claimables, breakdown] =
+        await Promise.all([
+          this.portfolioService.getTokenBalances(address, queryParams),
+          this.portfolioService.getAppBalances(address, queryParams),
+          this.portfolioService.getNFTBalances(address, queryParams),
+          this.portfolioService.getPortfolioTotals(address, queryParams),
+          this.portfolioService.getClaimables(address, queryParams),
+          this.portfolioService.getMetaTypeBreakdown(address, queryParams),
+        ]);
 
       return {
         tokens,

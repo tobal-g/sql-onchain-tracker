@@ -19,9 +19,21 @@ describe('SyncService', () => {
   ];
 
   const mockAssets = [
-    { id: 1, symbol: 'sUSDS', api_identifier: '0xa3931d71877c0e7a3148cb7eb4463524fec27fbd' },
-    { id: 2, symbol: 'USDC', api_identifier: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' },
-    { id: 9, symbol: 'ETH', api_identifier: '0x0000000000000000000000000000000000000000' },
+    {
+      id: 1,
+      symbol: 'sUSDS',
+      api_identifier: '0xa3931d71877c0e7a3148cb7eb4463524fec27fbd',
+    },
+    {
+      id: 2,
+      symbol: 'USDC',
+      api_identifier: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    },
+    {
+      id: 9,
+      symbol: 'ETH',
+      api_identifier: '0x0000000000000000000000000000000000000000',
+    },
   ];
 
   const mockTokenBalances = {
@@ -75,7 +87,9 @@ describe('SyncService', () => {
     };
 
     mockPositionsService = {
-      getZapperAssetIdsForCustodian: jest.fn().mockResolvedValue(new Set<number>()),
+      getZapperAssetIdsForCustodian: jest
+        .fn()
+        .mockResolvedValue(new Set<number>()),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -99,7 +113,9 @@ describe('SyncService', () => {
         .mockResolvedValueOnce({ rows: mockAssets }) // getAssets
         .mockResolvedValue({ rows: [] }); // upserts
 
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
 
       const result = await service.syncAllWallets();
@@ -154,7 +170,9 @@ describe('SyncService', () => {
         .mockResolvedValueOnce({ rows: mockAssets })
         .mockResolvedValue({ rows: [] });
 
-      mockPortfolioService.getTokenBalances.mockResolvedValue(tokensWithUnknown);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        tokensWithUnknown,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
 
       const result = await service.syncAllWallets();
@@ -175,7 +193,9 @@ describe('SyncService', () => {
         .mockResolvedValueOnce({ rows: mockAssets })
         .mockResolvedValue({ rows: [] });
 
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
 
       const result = await service.syncAllWallets();
@@ -227,7 +247,9 @@ describe('SyncService', () => {
         .mockResolvedValueOnce({ rows: mockAssets })
         .mockResolvedValue({ rows: [] });
 
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
 
       const result = await service.syncAllWallets();
@@ -264,7 +286,9 @@ describe('SyncService', () => {
         .mockResolvedValueOnce({ rows: mockAssets })
         .mockResolvedValue({ rows: [] });
 
-      mockPortfolioService.getTokenBalances.mockResolvedValue(emptyTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        emptyTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
 
       const result = await service.syncAllWallets();
@@ -296,7 +320,9 @@ describe('SyncService', () => {
         .mockResolvedValueOnce({ rows: mockAssets })
         .mockResolvedValue({ rows: [] });
 
-      mockPortfolioService.getTokenBalances.mockResolvedValue(unknownOnlyTokens);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        unknownOnlyTokens,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
 
       const result = await service.syncAllWallets();
@@ -383,11 +409,11 @@ describe('SyncService', () => {
     it('should execute upsert query with correct parameters', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      await service.upsertPriceHistory(1, 2500.50);
+      await service.upsertPriceHistory(1, 2500.5);
 
       expect(mockPool.query).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO price_history'),
-        [1, 2500.50],
+        [1, 2500.5],
       );
     });
 

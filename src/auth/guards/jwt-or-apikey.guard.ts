@@ -24,7 +24,8 @@ export class JwtOrApiKeyGuard implements CanActivate {
     private readonly configService: ConfigService,
   ) {
     // Auth is required only if AUTH_PASSWORD_HASH is configured
-    this.isAuthRequired = !!this.configService.get<string>('AUTH_PASSWORD_HASH');
+    this.isAuthRequired =
+      !!this.configService.get<string>('AUTH_PASSWORD_HASH');
     this.apiKey = this.configService.get<string>('SYNC_API_KEY');
 
     if (!this.isAuthRequired && !this.apiKey) {
@@ -78,9 +79,13 @@ export class JwtOrApiKeyGuard implements CanActivate {
         'Authentication required. Provide x-api-key header or Bearer token.',
       );
     } else if (this.apiKey) {
-      throw new UnauthorizedException('Missing API key. Provide x-api-key header.');
+      throw new UnauthorizedException(
+        'Missing API key. Provide x-api-key header.',
+      );
     } else {
-      throw new UnauthorizedException('Missing authorization header. Provide Bearer token.');
+      throw new UnauthorizedException(
+        'Missing authorization header. Provide Bearer token.',
+      );
     }
   }
 }

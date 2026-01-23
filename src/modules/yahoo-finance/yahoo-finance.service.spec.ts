@@ -134,9 +134,7 @@ describe('YahooFinanceService', () => {
     });
 
     it('should return null on Yahoo Finance error', async () => {
-      mockQuote.mockRejectedValueOnce(
-        new Error('Invalid ticker'),
-      );
+      mockQuote.mockRejectedValueOnce(new Error('Invalid ticker'));
 
       const price = await service.fetchPrice('INVALID');
       expect(price).toBeNull();
@@ -246,9 +244,7 @@ describe('YahooFinanceService', () => {
         .mockResolvedValueOnce({ regularMarketPrice: 18000 });
 
       // Upsert queries
-      mockPool.query
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({});
+      mockPool.query.mockResolvedValueOnce({}).mockResolvedValueOnce({});
 
       const result = await service.syncStockPrices();
 

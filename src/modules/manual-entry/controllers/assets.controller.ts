@@ -1,5 +1,10 @@
 import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AssetsService } from '../services/assets.service';
 import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import {
@@ -29,7 +34,9 @@ export class AssetsController {
   @ApiOperation({ summary: 'Create new asset' })
   @ApiResponse({ status: 201, type: CreateAssetResponseDto })
   @ApiResponse({ status: 409, description: 'Asset already exists' })
-  async createAsset(@Body() dto: CreateAssetDto): Promise<CreateAssetResponseDto> {
+  async createAsset(
+    @Body() dto: CreateAssetDto,
+  ): Promise<CreateAssetResponseDto> {
     return this.assetsService.createAsset(dto);
   }
 }

@@ -20,7 +20,8 @@ describe('PortfolioController', () => {
         balance: 28980487535.238518,
         balanceUSD: 31298.9265380576,
         price: 0.00000108,
-        imgUrlV2: 'https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x262a9f4e84efa2816d87a68606bb4c1ea3874bf1.png',
+        imgUrlV2:
+          'https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x262a9f4e84efa2816d87a68606bb4c1ea3874bf1.png',
         name: 'Bangkit',
         decimals: 18,
         balanceRaw: '28980487535238518000000000000',
@@ -41,7 +42,8 @@ describe('PortfolioController', () => {
         balanceUSD: 23939642.91719707,
         app: {
           displayName: 'Lido',
-          imgUrl: 'https://storage.googleapis.com/zapper-fi-assets/apps%2Flido.png',
+          imgUrl:
+            'https://storage.googleapis.com/zapper-fi-assets/apps%2Flido.png',
           description: 'Simplified and secure participation in staking',
           slug: 'lido',
           url: 'https://lido.fi/',
@@ -84,7 +86,9 @@ describe('PortfolioController', () => {
             ],
             displayProps: {
               label: 'wstETH',
-              images: ['https://storage.googleapis.com/zapper-fi-assets/tokens/ethereum/0x0000000000000000000000000000000000000000.png'],
+              images: [
+                'https://storage.googleapis.com/zapper-fi-assets/tokens/ethereum/0x0000000000000000000000000000000000000000.png',
+              ],
               balanceDisplayMode: null,
             },
           },
@@ -102,7 +106,8 @@ describe('PortfolioController', () => {
         token: {
           tokenId: '10407',
           name: 'Lil Pudgy #10407',
-          description: 'Lil Pudgys are a collection of 22,222 randomly generated NFTs minted on Ethereum.',
+          description:
+            'Lil Pudgys are a collection of 22,222 randomly generated NFTs minted on Ethereum.',
           supply: '1',
           circulatingSupply: '1',
           estimatedValue: {
@@ -129,11 +134,16 @@ describe('PortfolioController', () => {
                 blurhash: 'URHyw=WZ0stTN2j?xuWD0ut8^aj[?vWYIUt6',
                 height: 250,
                 width: 250,
-                originalUri: 'https://storage.googleapis.com/zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png',
-                original: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&checksum=VklwQoOgHYKsPj8GPZ1FDTXN8hPPSaVBjHCmiQ7vZy8',
-                large: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=500&checksum=NlRY3lUeBcOFw3CzxcAGAQKxOLw3JhreqJ38BZTC9D0',
-                medium: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=250&checksum=VPxH2Ejt_0dOcWCesNcsfQYZgcGYPIFERQexdytLyP0',
-                thumbnail: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=100&checksum=BFebU_PxxIAdlqld0-cJ_M0bjMTd3qTBRdFx02pBX5M',
+                originalUri:
+                  'https://storage.googleapis.com/zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png',
+                original:
+                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&checksum=VklwQoOgHYKsPj8GPZ1FDTXN8hPPSaVBjHCmiQ7vZy8',
+                large:
+                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=500&checksum=NlRY3lUeBcOFw3CzxcAGAQKxOLw3JhreqJ38BZTC9D0',
+                medium:
+                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=250&checksum=VPxH2Ejt_0dOcWCesNcsfQYZgcGYPIFERQexdytLyP0',
+                thumbnail:
+                  'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/collections/ethereum/0x524cab2ec69124574082676e6f654a18df49a048/logo.png&width=100&checksum=BFebU_PxxIAdlqld0-cJ_M0bjMTd3qTBRdFx02pBX5M',
                 predominantColor: '#9ab3ed',
               },
             },
@@ -149,10 +159,14 @@ describe('PortfolioController', () => {
                     height: 2700,
                     width: 2700,
                     originalUri: 'https://api.pudgypenguins.io/lil/image/10407',
-                    original: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&checksum=fRHieiOCQj_0piw8VZc-HDP-f5Uy8cl4p99Dx-66ycM',
-                    thumbnail: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=100&checksum=oDAXzMIzWvlGOLbb1nN8IWKl4_B26B840wd6CXwhSWw',
-                    medium: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=250&checksum=jiyBP_I0JxBPasrg273qHzkTPOfnzRyMCdHakPTV-vk',
-                    large: 'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=500&checksum=Ndb7k_Uoscl4oQ8vjoCCLljQcDG7BvtTV-SQ6w6JDRM',
+                    original:
+                      'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&checksum=fRHieiOCQj_0piw8VZc-HDP-f5Uy8cl4p99Dx-66ycM',
+                    thumbnail:
+                      'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=100&checksum=oDAXzMIzWvlGOLbb1nN8IWKl4_B26B840wd6CXwhSWw',
+                    medium:
+                      'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=250&checksum=jiyBP_I0JxBPasrg273qHzkTPOfnzRyMCdHakPTV-vk',
+                    large:
+                      'https://images.zapper.xyz/z/?path=zapper-fi-assets/nfts/medias/fa856d9f7907ea90f93067a80cfe2a84be04242e834306ddcbe25876438a8684.png&width=500&checksum=Ndb7k_Uoscl4oQ8vjoCCLljQcDG7BvtTV-SQ6w6JDRM',
                     predominantColor: '#e35063',
                   },
                 },
@@ -216,7 +230,8 @@ describe('PortfolioController', () => {
       {
         app: {
           displayName: 'Uniswap V3',
-          imgUrl: 'https://storage.googleapis.com/zapper-fi-assets/apps%2Funiswap-v3.png',
+          imgUrl:
+            'https://storage.googleapis.com/zapper-fi-assets/apps%2Funiswap-v3.png',
           description: 'Uniswap V3',
           slug: 'uniswap-v3',
           url: 'https://uniswap.org/',
@@ -249,7 +264,9 @@ describe('PortfolioController', () => {
         ],
         displayProps: {
           label: '⌘ / WETH (Token ID: 1568607)',
-          images: ['https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x4200000000000000000000000000000000000006.png'],
+          images: [
+            'https://storage.googleapis.com/zapper-fi-assets/tokens/base/0x4200000000000000000000000000000000000006.png',
+          ],
           balanceDisplayMode: null,
         },
       },
@@ -310,16 +327,23 @@ describe('PortfolioController', () => {
 
   describe('getTokenBalances', () => {
     it('should return token balances for a valid address', async () => {
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
 
       const result = await controller.getTokenBalances(validAddress, {});
 
       expect(result).toBe(mockTokenBalances);
-      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
 
     it('should pass query parameters correctly', async () => {
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
 
       const queryParams = {
         chainIds: [8453],
@@ -329,14 +353,22 @@ describe('PortfolioController', () => {
 
       await controller.getTokenBalances(validAddress, queryParams);
 
-      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should propagate service errors', async () => {
-      const error = new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
+      const error = new HttpException(
+        'Invalid address format',
+        HttpStatus.BAD_REQUEST,
+      );
       mockPortfolioService.getTokenBalances.mockRejectedValue(error);
 
-      await expect(controller.getTokenBalances('invalid-address', {})).rejects.toThrow(error);
+      await expect(
+        controller.getTokenBalances('invalid-address', {}),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -347,7 +379,10 @@ describe('PortfolioController', () => {
       const result = await controller.getAppBalances(validAddress, {});
 
       expect(result).toBe(mockAppBalances);
-      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
 
     it('should pass query parameters correctly', async () => {
@@ -360,14 +395,22 @@ describe('PortfolioController', () => {
 
       await controller.getAppBalances(validAddress, queryParams);
 
-      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should propagate service errors', async () => {
-      const error = new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
+      const error = new HttpException(
+        'Invalid address format',
+        HttpStatus.BAD_REQUEST,
+      );
       mockPortfolioService.getAppBalances.mockRejectedValue(error);
 
-      await expect(controller.getAppBalances('invalid-address', {})).rejects.toThrow(error);
+      await expect(
+        controller.getAppBalances('invalid-address', {}),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -378,7 +421,10 @@ describe('PortfolioController', () => {
       const result = await controller.getNFTBalances(validAddress, {});
 
       expect(result).toBe(mockNFTBalances);
-      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
 
     it('should pass query parameters correctly', async () => {
@@ -392,29 +438,44 @@ describe('PortfolioController', () => {
 
       await controller.getNFTBalances(validAddress, queryParams);
 
-      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should propagate service errors', async () => {
-      const error = new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
+      const error = new HttpException(
+        'Invalid address format',
+        HttpStatus.BAD_REQUEST,
+      );
       mockPortfolioService.getNFTBalances.mockRejectedValue(error);
 
-      await expect(controller.getNFTBalances('invalid-address', {})).rejects.toThrow(error);
+      await expect(
+        controller.getNFTBalances('invalid-address', {}),
+      ).rejects.toThrow(error);
     });
   });
 
   describe('getPortfolioTotals', () => {
     it('should return portfolio totals for a valid address', async () => {
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
 
       const result = await controller.getPortfolioTotals(validAddress, {});
 
       expect(result).toBe(mockPortfolioTotals);
-      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
 
     it('should pass query parameters correctly', async () => {
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
 
       const queryParams = {
         chainIds: [8453],
@@ -423,14 +484,22 @@ describe('PortfolioController', () => {
 
       await controller.getPortfolioTotals(validAddress, queryParams);
 
-      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should propagate service errors', async () => {
-      const error = new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
+      const error = new HttpException(
+        'Invalid address format',
+        HttpStatus.BAD_REQUEST,
+      );
       mockPortfolioService.getPortfolioTotals.mockRejectedValue(error);
 
-      await expect(controller.getPortfolioTotals('invalid-address', {})).rejects.toThrow(error);
+      await expect(
+        controller.getPortfolioTotals('invalid-address', {}),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -441,7 +510,10 @@ describe('PortfolioController', () => {
       const result = await controller.getClaimables(validAddress, {});
 
       expect(result).toBe(mockClaimables);
-      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
 
     it('should pass query parameters correctly', async () => {
@@ -453,29 +525,44 @@ describe('PortfolioController', () => {
 
       await controller.getClaimables(validAddress, queryParams);
 
-      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should propagate service errors', async () => {
-      const error = new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
+      const error = new HttpException(
+        'Invalid address format',
+        HttpStatus.BAD_REQUEST,
+      );
       mockPortfolioService.getClaimables.mockRejectedValue(error);
 
-      await expect(controller.getClaimables('invalid-address', {})).rejects.toThrow(error);
+      await expect(
+        controller.getClaimables('invalid-address', {}),
+      ).rejects.toThrow(error);
     });
   });
 
   describe('getMetaTypeBreakdown', () => {
     it('should return meta type breakdown for a valid address', async () => {
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
       const result = await controller.getMetaTypeBreakdown(validAddress, {});
 
       expect(result).toBe(mockMetaTypeBreakdown);
-      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
 
     it('should pass query parameters correctly', async () => {
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
       const queryParams = {
         chainIds: [8453],
@@ -484,26 +571,40 @@ describe('PortfolioController', () => {
 
       await controller.getMetaTypeBreakdown(validAddress, queryParams);
 
-      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should propagate service errors', async () => {
-      const error = new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
+      const error = new HttpException(
+        'Invalid address format',
+        HttpStatus.BAD_REQUEST,
+      );
       mockPortfolioService.getMetaTypeBreakdown.mockRejectedValue(error);
 
-      await expect(controller.getMetaTypeBreakdown('invalid-address', {})).rejects.toThrow(error);
+      await expect(
+        controller.getMetaTypeBreakdown('invalid-address', {}),
+      ).rejects.toThrow(error);
     });
   });
 
   describe('getCompletePortfolio', () => {
     it('should return complete portfolio data for a valid address', async () => {
       // Mock all service methods
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
       mockPortfolioService.getNFTBalances.mockResolvedValue(mockNFTBalances);
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
       mockPortfolioService.getClaimables.mockResolvedValue(mockClaimables);
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
       const result = await controller.getCompletePortfolio(validAddress, {});
 
@@ -517,21 +618,45 @@ describe('PortfolioController', () => {
       });
 
       // Verify all service methods were called in parallel
-      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(validAddress, {});
-      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(validAddress, {});
-      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(validAddress, {});
-      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(validAddress, {});
-      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(validAddress, {});
-      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
+      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
+      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
+      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
+      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
+      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
 
     it('should pass query parameters to all service methods', async () => {
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
       mockPortfolioService.getNFTBalances.mockResolvedValue(mockNFTBalances);
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
       mockPortfolioService.getClaimables.mockResolvedValue(mockClaimables);
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
       const queryParams = {
         chainIds: [8453],
@@ -541,24 +666,51 @@ describe('PortfolioController', () => {
 
       await controller.getCompletePortfolio(validAddress, queryParams);
 
-      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should propagate HttpExceptions from service methods', async () => {
-      const error = new HttpException('Invalid address format', HttpStatus.BAD_REQUEST);
+      const error = new HttpException(
+        'Invalid address format',
+        HttpStatus.BAD_REQUEST,
+      );
       mockPortfolioService.getTokenBalances.mockRejectedValue(error);
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
       mockPortfolioService.getNFTBalances.mockResolvedValue(mockNFTBalances);
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
       mockPortfolioService.getClaimables.mockResolvedValue(mockClaimables);
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
-      await expect(controller.getCompletePortfolio('invalid-address', {})).rejects.toThrow(error);
+      await expect(
+        controller.getCompletePortfolio('invalid-address', {}),
+      ).rejects.toThrow(error);
     });
 
     it('should handle non-HttpException errors and convert to internal server error', async () => {
@@ -566,25 +718,45 @@ describe('PortfolioController', () => {
       mockPortfolioService.getTokenBalances.mockRejectedValue(error);
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
       mockPortfolioService.getNFTBalances.mockResolvedValue(mockNFTBalances);
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
       mockPortfolioService.getClaimables.mockResolvedValue(mockClaimables);
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
-      await expect(controller.getCompletePortfolio(validAddress, {})).rejects.toThrow(
-        new HttpException('Failed to fetch complete portfolio data', HttpStatus.INTERNAL_SERVER_ERROR),
+      await expect(
+        controller.getCompletePortfolio(validAddress, {}),
+      ).rejects.toThrow(
+        new HttpException(
+          'Failed to fetch complete portfolio data',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
       );
     });
 
     it('should handle partial failures in parallel execution', async () => {
-      const error = new HttpException('Service temporarily unavailable', HttpStatus.SERVICE_UNAVAILABLE);
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      const error = new HttpException(
+        'Service temporarily unavailable',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockRejectedValue(error);
       mockPortfolioService.getNFTBalances.mockResolvedValue(mockNFTBalances);
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
       mockPortfolioService.getClaimables.mockResolvedValue(mockClaimables);
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
-      await expect(controller.getCompletePortfolio(validAddress, {})).rejects.toThrow(error);
+      await expect(
+        controller.getCompletePortfolio(validAddress, {}),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -600,10 +772,15 @@ describe('PortfolioController', () => {
 
     endpoints.forEach(({ method, serviceMock }) => {
       it(`should handle service errors in ${method}`, async () => {
-        const error = new HttpException('Service error', HttpStatus.INTERNAL_SERVER_ERROR);
+        const error = new HttpException(
+          'Service error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
         mockPortfolioService[serviceMock].mockRejectedValue(error);
 
-        await expect(controller[method](validAddress, {})).rejects.toThrow(error);
+        await expect(controller[method](validAddress, {})).rejects.toThrow(
+          error,
+        );
       });
     });
   });
@@ -617,12 +794,18 @@ describe('PortfolioController', () => {
       };
 
       // Mock successful responses for all services
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
       mockPortfolioService.getAppBalances.mockResolvedValue(mockAppBalances);
       mockPortfolioService.getNFTBalances.mockResolvedValue(mockNFTBalances);
-      mockPortfolioService.getPortfolioTotals.mockResolvedValue(mockPortfolioTotals);
+      mockPortfolioService.getPortfolioTotals.mockResolvedValue(
+        mockPortfolioTotals,
+      );
       mockPortfolioService.getClaimables.mockResolvedValue(mockClaimables);
-      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(mockMetaTypeBreakdown);
+      mockPortfolioService.getMetaTypeBreakdown.mockResolvedValue(
+        mockMetaTypeBreakdown,
+      );
 
       // Test all endpoints accept the query parameters
       await controller.getTokenBalances(validAddress, queryParams);
@@ -633,20 +816,43 @@ describe('PortfolioController', () => {
       await controller.getMetaTypeBreakdown(validAddress, queryParams);
 
       // Verify parameters were passed correctly
-      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(validAddress, queryParams);
-      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(validAddress, queryParams);
+      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getAppBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getNFTBalances).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getPortfolioTotals).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getClaimables).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
+      expect(mockPortfolioService.getMetaTypeBreakdown).toHaveBeenCalledWith(
+        validAddress,
+        queryParams,
+      );
     });
 
     it('should handle empty query parameters', async () => {
-      mockPortfolioService.getTokenBalances.mockResolvedValue(mockTokenBalances);
+      mockPortfolioService.getTokenBalances.mockResolvedValue(
+        mockTokenBalances,
+      );
 
       await controller.getTokenBalances(validAddress, {});
 
-      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(validAddress, {});
+      expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(
+        validAddress,
+        {},
+      );
     });
   });
 });

@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  Logger,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, Inject, Logger, ConflictException } from '@nestjs/common';
 import { Pool } from 'pg';
 import { DATABASE_POOL } from '../../../database/database.module';
 import {

@@ -34,9 +34,14 @@ function parseExpiry(expiry: string): number {
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET', 'dev-secret-change-in-production'),
+        secret: configService.get<string>(
+          'JWT_SECRET',
+          'dev-secret-change-in-production',
+        ),
         signOptions: {
-          expiresIn: parseExpiry(configService.get<string>('JWT_ACCESS_EXPIRY', '15m')),
+          expiresIn: parseExpiry(
+            configService.get<string>('JWT_ACCESS_EXPIRY', '15m'),
+          ),
         },
       }),
       inject: [ConfigService],

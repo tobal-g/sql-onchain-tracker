@@ -27,7 +27,9 @@ export class UpsertPositionDto {
   @IsNumber()
   asset_id?: number;
 
-  @ApiPropertyOptional({ description: 'Asset symbol (alternative to asset_id)' })
+  @ApiPropertyOptional({
+    description: 'Asset symbol (alternative to asset_id)',
+  })
   @IsOptional()
   @IsString()
   asset_symbol?: string;

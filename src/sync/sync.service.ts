@@ -47,7 +47,10 @@ export class SyncService {
     private readonly positionsService: PositionsService,
     @Optional() private readonly zerionService?: ZerionService,
   ) {
-    this.rateLimitDelay = this.configService.get<number>('SYNC_RATE_LIMIT_MS', 1000);
+    this.rateLimitDelay = this.configService.get<number>(
+      'SYNC_RATE_LIMIT_MS',
+      1000,
+    );
   }
 
   /**
@@ -107,7 +110,9 @@ export class SyncService {
         `Failed to fetch custodians: ${error.message}`,
         error.stack,
       );
-      throw new Error(`Failed to fetch custodians from database: ${error.message}`);
+      throw new Error(
+        `Failed to fetch custodians from database: ${error.message}`,
+      );
     }
   }
 
@@ -123,7 +128,10 @@ export class SyncService {
       this.logger.log(`Found ${result.rows.length} assets in database`);
       return result.rows;
     } catch (error) {
-      this.logger.error(`Failed to fetch assets: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to fetch assets: ${error.message}`,
+        error.stack,
+      );
       throw new Error(`Failed to fetch assets from database: ${error.message}`);
     }
   }
@@ -205,7 +213,8 @@ export class SyncService {
     if (!normalizedAddress) return null;
 
     // Native tokens (ETH, BTC) share the zero address - match by symbol instead
-    const isNativeToken = normalizedAddress === '0x0000000000000000000000000000000000000000';
+    const isNativeToken =
+      normalizedAddress === '0x0000000000000000000000000000000000000000';
     const asset = isNativeToken
       ? assetLookup.get(symbol.toLowerCase())
       : assetLookup.get(normalizedAddress);
@@ -288,7 +297,7 @@ export class SyncService {
       for (const position of appBalance.positionBalances) {
         if (position.type === 'app-token') {
           // AppTokenPositionBalanceDto
-          const appToken = position as AppTokenPositionBalanceDto;
+          const appToken = position;
           const assetId = await this.processToken(
             appToken.address,
             appToken.symbol,
@@ -304,7 +313,7 @@ export class SyncService {
           }
         } else if (position.type === 'contract-position') {
           // ContractPositionBalanceDto - has nested tokens
-          const contractPos = position as ContractPositionBalanceDto;
+          const contractPos = position;
           if (contractPos.tokens) {
             for (const tokenWithMeta of contractPos.tokens) {
               const token = tokenWithMeta.token;
@@ -345,8 +354,10 @@ export class SyncService {
 
     try {
       // Get existing position asset IDs BEFORE processing (for zeroing logic)
-      const existingZapperAssetIds = await this.positionsService.getZapperAssetIdsForCustodian(custodian.id);
-      const existingZerionAssetIds = await this.positionsService.getZerionAssetIdsForCustodian(custodian.id);
+      const existingZapperAssetIds =
+        await this.positionsService.getZapperAssetIdsForCustodian(custodian.id);
+      const existingZerionAssetIds =
+        await this.positionsService.getZerionAssetIdsForCustodian(custodian.id);
 
       // ============================================
       // ZAPPER: Fetch and process positions
@@ -388,7 +399,9 @@ export class SyncService {
         if (!zapperFoundIds.has(assetId)) {
           await this.upsertPosition(assetId, custodian.id, 0);
           summary.positionsZeroed++;
-          this.logger.log(`Zeroed Zapper position: asset_id=${assetId}, custodian_id=${custodian.id}`);
+          this.logger.log(
+            `Zeroed Zapper position: asset_id=${assetId}, custodian_id=${custodian.id}`,
+          );
         }
       }
 
@@ -407,7 +420,9 @@ export class SyncService {
         if (!zerionFoundIds.has(assetId)) {
           await this.upsertPosition(assetId, custodian.id, 0);
           summary.positionsZeroed++;
-          this.logger.log(`Zeroed Zerion position: asset_id=${assetId}, custodian_id=${custodian.id}`);
+          this.logger.log(
+            `Zeroed Zerion position: asset_id=${assetId}, custodian_id=${custodian.id}`,
+          );
         }
       }
 
@@ -440,11 +455,15 @@ export class SyncService {
     }
 
     try {
-      const positions = await this.zerionService.fetchWalletPositions(walletAddress);
+      const positions =
+        await this.zerionService.fetchWalletPositions(walletAddress);
 
       // Aggregate quantities per asset BEFORE upserting
       // (handles multiple positions of same token, e.g., SKY in different staking pools)
-      const aggregated = new Map<number, { quantity: number; price: number; symbol: string }>();
+      const aggregated = new Map<
+        number,
+        { quantity: number; price: number; symbol: string }
+      >();
 
       for (const position of positions) {
         const asset = assetLookup.get(position.tokenAddress);
@@ -477,11 +496,15 @@ export class SyncService {
         if (data.price > 0) {
           await this.upsertPriceHistory(assetId, data.price, 'zerion');
           summary.pricesUpdated++;
-          this.logger.debug(`Zerion: ${data.symbol} - qty: ${data.quantity}, price: $${data.price}`);
+          this.logger.debug(
+            `Zerion: ${data.symbol} - qty: ${data.quantity}, price: $${data.price}`,
+          );
         }
       }
     } catch (error) {
-      this.logger.error(`Failed to process Zerion positions for wallet ${walletAddress}: ${error.message}`);
+      this.logger.error(
+        `Failed to process Zerion positions for wallet ${walletAddress}: ${error.message}`,
+      );
     }
 
     return foundAssetIds;

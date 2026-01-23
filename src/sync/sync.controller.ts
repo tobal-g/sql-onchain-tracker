@@ -31,7 +31,8 @@ export class SyncController {
   @ApiBearerAuth('JWT-auth')
   @ApiHeader({
     name: 'x-api-key',
-    description: 'API key for automated/service authentication (alternative to Bearer token)',
+    description:
+      'API key for automated/service authentication (alternative to Bearer token)',
     required: false,
   })
   @ApiOperation({
