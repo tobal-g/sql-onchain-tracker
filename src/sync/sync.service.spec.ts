@@ -166,7 +166,7 @@ describe('SyncService', () => {
 
     it('should process BTC wallets with correct chainId', async () => {
       const custodiansWithBtc = [
-        { id: 1, wallet_address: 'bc1qyscafxhft4ylyqt6ra4496g24lhqev0mng4c5d' }, // BTC
+        { id: 1, wallet_address: 'bc1qz8m0zcswgqwu386ju7a30xaz620rgg9j5wp62g' }, // BTC
         { id: 2, wallet_address: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B' }, // ETH
       ];
 
@@ -190,7 +190,7 @@ describe('SyncService', () => {
 
       // BTC wallet should use chainId 6172014
       expect(mockPortfolioService.getTokenBalances).toHaveBeenCalledWith(
-        'bc1qyscafxhft4ylyqt6ra4496g24lhqev0mng4c5d',
+        'bc1qz8m0zcswgqwu386ju7a30xaz620rgg9j5wp62g',
         { first: 100, chainIds: [6172014] },
       );
 

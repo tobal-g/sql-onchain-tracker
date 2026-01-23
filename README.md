@@ -92,13 +92,20 @@ Stock and CEDEAR price synchronization:
 - Converts ARS prices to USD using CCL rate from DolarAPI
 - Daily price history updates
 
-### 6. Authentication Guard
+### 6. Zerion Module
+Fallback price source for tokens Zapper cannot track:
+- Integrated into `/sync/portfolio` endpoint
+- Fetches prices for assets with `price_api_source = 'zerion'`
+- Uses Zerion's `/fungibles/{id}` endpoint for price data
+- Gracefully skips if `ZERION_API_KEY` not configured
+
+### 7. Authentication Guard
 API key-based authentication for protected endpoints:
 - Optional in development (no key = open access)
 - Required in production via `SYNC_API_KEY` env var
 - Uses `x-api-key` header
 
-### 7. Frontend Dashboard
+### 8. Frontend Dashboard
 React-based portfolio visualization:
 - Portfolio overview with total value and statistics
 - Charts: allocation by type, by custodian, top holdings
@@ -319,6 +326,14 @@ SYNC_API_KEY=your_secret_sync_api_key
 SYNC_RATE_LIMIT_MS=1000
 
 # ============================================
+# ZERION API CONFIGURATION (Optional)
+# ============================================
+# API key for Zerion API (base64 encoded)
+# Used as fallback price source for tokens Zapper can't track
+# Set price_api_source='zerion' on assets that need it
+ZERION_API_KEY=your_zerion_api_key_base64
+
+# ============================================
 # CORS CONFIGURATION (Optional)
 # ============================================
 # Frontend origin for CORS (defaults to http://localhost:5173)
@@ -337,6 +352,7 @@ CORS_ORIGIN=http://localhost:5173
 | `CACHE_TTL` | No | `90` | Cache TTL in seconds |
 | `SYNC_API_KEY` | No | - | API key for sync endpoint (if unset, endpoint is open) |
 | `SYNC_RATE_LIMIT_MS` | No | `1000` | Delay between wallet syncs |
+| `ZERION_API_KEY` | No | - | Zerion API key (base64) for fallback price source |
 | `CORS_ORIGIN` | No | `http://localhost:5173` | Frontend origin for CORS |
 
 ---

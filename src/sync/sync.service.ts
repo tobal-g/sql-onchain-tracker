@@ -1,9 +1,10 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Inject, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { DATABASE_POOL } from '../database/database.module';
 import { PortfolioService } from '../portfolio/portfolio.service';
 import { PositionsService } from '../modules/manual-entry/services/positions.service';
+import { ZerionService } from '../modules/zerion/zerion.service';
 import { SyncResponseDto } from './dto/sync-response.dto';
 import {
   TokenBalanceDto,
@@ -22,6 +23,7 @@ interface Asset {
   id: number;
   symbol: string;
   api_identifier: string | null;
+  price_api_source: string | null;
 }
 
 // Summary tracking during sync
@@ -43,6 +45,7 @@ export class SyncService {
     private readonly portfolioService: PortfolioService,
     private readonly configService: ConfigService,
     private readonly positionsService: PositionsService,
+    @Optional() private readonly zerionService?: ZerionService,
   ) {
     this.rateLimitDelay = this.configService.get<number>('SYNC_RATE_LIMIT_MS', 1000);
   }
@@ -113,7 +116,7 @@ export class SyncService {
    * Used to match Zapper tokens to our asset records.
    */
   async getAssets(): Promise<Asset[]> {
-    const query = `SELECT id, symbol, api_identifier FROM assets`;
+    const query = `SELECT id, symbol, api_identifier, price_api_source FROM assets`;
 
     try {
       const result = await this.pool.query(query);
@@ -158,16 +161,20 @@ export class SyncService {
    * Upserts a price history record for today.
    * Uses ON CONFLICT to update if we already have today's price.
    */
-  async upsertPriceHistory(assetId: number, priceUsd: number): Promise<void> {
+  async upsertPriceHistory(
+    assetId: number,
+    priceUsd: number,
+    source: string = 'zapper',
+  ): Promise<void> {
     const query = `
       INSERT INTO price_history (asset_id, price_usd, price_date, source)
-      VALUES ($1, $2, CURRENT_DATE, 'zapper')
+      VALUES ($1, $2, CURRENT_DATE, $3)
       ON CONFLICT (asset_id, price_date)
-      DO UPDATE SET price_usd = $2, source = 'zapper'
+      DO UPDATE SET price_usd = EXCLUDED.price_usd, source = EXCLUDED.source
     `;
 
     try {
-      await this.pool.query(query, [assetId, priceUsd]);
+      await this.pool.query(query, [assetId, priceUsd, source]);
     } catch (error) {
       this.logger.error(
         `Failed to upsert price history (asset: ${assetId}): ${error.message}`,
@@ -180,7 +187,8 @@ export class SyncService {
   }
 
   /**
-   * Processes a single token: matches to asset, upserts position and price.
+   * Processes a single token from Zapper: matches to asset, upserts position and price.
+   * Skips zerion-sourced assets (they're handled separately in processZerionPositions).
    * Returns asset ID if processed, null if skipped.
    */
   private async processToken(
@@ -209,14 +217,19 @@ export class SyncService {
       return null;
     }
 
+    // Skip zerion-sourced assets - they're handled in processZerionPositions()
+    if (asset.price_api_source === 'zerion') {
+      return null;
+    }
+
     try {
       // Upsert position
       await this.upsertPosition(asset.id, custodianId, balance);
       summary.positionsUpdated++;
 
-      // Upsert price if valid
+      // Upsert price from Zapper if valid
       if (price !== undefined && price > 0) {
-        await this.upsertPriceHistory(asset.id, price);
+        await this.upsertPriceHistory(asset.id, price, 'zapper');
         summary.pricesUpdated++;
       }
 
@@ -317,7 +330,7 @@ export class SyncService {
   }
 
   /**
-   * Syncs a single wallet: fetches from Zapper and updates database.
+   * Syncs a single wallet: fetches from Zapper and Zerion, updates database.
    */
   private async syncWallet(
     custodian: Custodian,
@@ -331,10 +344,13 @@ export class SyncService {
     this.logger.log(`Processing ${isBtc ? 'BTC' : 'EVM'} wallet: ${truncated}`);
 
     try {
-      // Get existing Zapper position asset IDs BEFORE processing
-      const existingAssetIds = await this.positionsService.getZapperAssetIdsForCustodian(custodian.id);
+      // Get existing position asset IDs BEFORE processing (for zeroing logic)
+      const existingZapperAssetIds = await this.positionsService.getZapperAssetIdsForCustodian(custodian.id);
+      const existingZerionAssetIds = await this.positionsService.getZerionAssetIdsForCustodian(custodian.id);
 
-      // Fetch token balances (use BTC chainId for Bitcoin wallets)
+      // ============================================
+      // ZAPPER: Fetch and process positions
+      // ============================================
       const tokenBalances = await this.portfolioService.getTokenBalances(
         walletAddress,
         { first: 100, chainIds: isBtc ? [6172014] : undefined },
@@ -365,15 +381,33 @@ export class SyncService {
         );
       }
 
-      // Combine all found asset IDs
-      const allFoundIds = new Set([...tokenFoundIds, ...appFoundIds]);
+      const zapperFoundIds = new Set([...tokenFoundIds, ...appFoundIds]);
 
-      // Zero positions not found in Zapper response
-      for (const assetId of existingAssetIds) {
-        if (!allFoundIds.has(assetId)) {
+      // Zero Zapper positions not found in response
+      for (const assetId of existingZapperAssetIds) {
+        if (!zapperFoundIds.has(assetId)) {
           await this.upsertPosition(assetId, custodian.id, 0);
           summary.positionsZeroed++;
-          this.logger.log(`Zeroed position: asset_id=${assetId}, custodian_id=${custodian.id}`);
+          this.logger.log(`Zeroed Zapper position: asset_id=${assetId}, custodian_id=${custodian.id}`);
+        }
+      }
+
+      // ============================================
+      // ZERION: Fetch and process positions
+      // ============================================
+      const zerionFoundIds = await this.processZerionPositions(
+        custodian.id,
+        walletAddress,
+        assetLookup,
+        summary,
+      );
+
+      // Zero Zerion positions not found in response
+      for (const assetId of existingZerionAssetIds) {
+        if (!zerionFoundIds.has(assetId)) {
+          await this.upsertPosition(assetId, custodian.id, 0);
+          summary.positionsZeroed++;
+          this.logger.log(`Zeroed Zerion position: asset_id=${assetId}, custodian_id=${custodian.id}`);
         }
       }
 
@@ -384,6 +418,73 @@ export class SyncService {
       this.logger.error(errorMsg);
       summary.errors.push(errorMsg);
     }
+  }
+
+  /**
+   * Fetches positions from Zerion and processes only zerion-sourced assets.
+   * Aggregates multiple positions of the same asset (e.g., SKY in multiple staking pools)
+   * before upserting to avoid overwrites.
+   * Returns Set of asset IDs that were found and processed.
+   */
+  private async processZerionPositions(
+    custodianId: number,
+    walletAddress: string,
+    assetLookup: Map<string, Asset>,
+    summary: SyncSummary,
+  ): Promise<Set<number>> {
+    const foundAssetIds = new Set<number>();
+
+    // Skip if Zerion is not configured
+    if (!this.zerionService?.isConfigured()) {
+      return foundAssetIds;
+    }
+
+    try {
+      const positions = await this.zerionService.fetchWalletPositions(walletAddress);
+
+      // Aggregate quantities per asset BEFORE upserting
+      // (handles multiple positions of same token, e.g., SKY in different staking pools)
+      const aggregated = new Map<number, { quantity: number; price: number; symbol: string }>();
+
+      for (const position of positions) {
+        const asset = assetLookup.get(position.tokenAddress);
+
+        // Only process assets configured to use Zerion as source
+        if (!asset || asset.price_api_source !== 'zerion') {
+          continue;
+        }
+
+        const existing = aggregated.get(asset.id);
+        if (existing) {
+          existing.quantity += position.quantity; // Sum quantities
+          // Price stays the same (all positions of same token have same price)
+        } else {
+          aggregated.set(asset.id, {
+            quantity: position.quantity,
+            price: position.price,
+            symbol: position.symbol,
+          });
+        }
+      }
+
+      // Upsert once per asset with aggregated totals
+      for (const [assetId, data] of aggregated) {
+        await this.upsertPosition(assetId, custodianId, data.quantity);
+        summary.positionsUpdated++;
+        foundAssetIds.add(assetId);
+
+        // Upsert price if valid
+        if (data.price > 0) {
+          await this.upsertPriceHistory(assetId, data.price, 'zerion');
+          summary.pricesUpdated++;
+          this.logger.debug(`Zerion: ${data.symbol} - qty: ${data.quantity}, price: $${data.price}`);
+        }
+      }
+    } catch (error) {
+      this.logger.error(`Failed to process Zerion positions for wallet ${walletAddress}: ${error.message}`);
+    }
+
+    return foundAssetIds;
   }
 
   /**

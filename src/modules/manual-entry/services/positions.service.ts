@@ -232,4 +232,22 @@ export class PositionsService {
     const result = await this.pool.query(query, [custodianId]);
     return new Set(result.rows.map(row => row.asset_id));
   }
+
+  /**
+   * Gets asset IDs for positions owned by a custodian where
+   * the asset uses Zerion as the price source.
+   * Used by sync to identify which positions to zero if not found in Zerion response.
+   */
+  async getZerionAssetIdsForCustodian(custodianId: number): Promise<Set<number>> {
+    const query = `
+      SELECT p.asset_id
+      FROM positions p
+      JOIN assets a ON p.asset_id = a.id
+      WHERE p.custodian_id = $1
+        AND a.price_api_source = 'zerion'
+        AND p.quantity > 0
+    `;
+    const result = await this.pool.query(query, [custodianId]);
+    return new Set(result.rows.map(row => row.asset_id));
+  }
 }

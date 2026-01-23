@@ -51,6 +51,7 @@ npm run lint               # ESLint
 │   ├── sync/                         # Wallet sync to database
 │   └── modules/
 │       ├── yahoo-finance/            # Stock/CEDEAR price sync
+│       ├── zerion/                   # Fallback price source (SKY, etc.)
 │       └── manual-entry/             # CRUD for assets, positions, etc.
 ├── frontend/                         # React dashboard
 │   └── src/
@@ -90,6 +91,7 @@ PostgreSQL via Neon.tech with tables:
 | API | Purpose | Rate Limiting |
 |-----|---------|---------------|
 | Zapper GraphQL | Crypto balances | SYNC_RATE_LIMIT_MS (default 1000ms) |
+| Zerion | Fallback prices (e.g., SKY token) | On-demand during sync |
 | Yahoo Finance | Stock/CEDEAR prices | 500ms between requests |
 | DolarAPI | CCL rate for ARS-USD | On-demand |
 
@@ -101,6 +103,7 @@ Required:
 
 Optional:
 - `SYNC_API_KEY` - Protects sync endpoints (if set)
+- `ZERION_API_KEY` - Zerion API key (base64) for fallback price source
 - `CORS_ORIGIN` - Frontend origin (default: http://localhost:5173)
 - `CACHE_TTL` - Cache TTL in seconds (default: 90)
 
