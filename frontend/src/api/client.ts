@@ -13,6 +13,7 @@ import type {
   TransactionsListResponse,
   CreateTransactionRequest,
   CreateTransactionResponse,
+  PnlResponse,
   Asset,
   Custodian,
 } from '../types';
@@ -56,6 +57,15 @@ api.interceptors.response.use(
 // Portfolio Summary
 export const getPortfolioSummary = async (): Promise<PortfolioSummary> => {
   const { data } = await api.get<PortfolioSummary>('/portfolio/summary');
+  return data;
+};
+
+// Portfolio PnL
+export const getPnl = async (params?: {
+  asset_id?: number;
+  include_zero_positions?: boolean;
+}): Promise<PnlResponse> => {
+  const { data } = await api.get<PnlResponse>('/portfolio/pnl', { params });
   return data;
 };
 

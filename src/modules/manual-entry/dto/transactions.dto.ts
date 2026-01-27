@@ -117,7 +117,4 @@ export class CreateTransactionResponseDto {
 
   @ApiProperty()
   transaction: TransactionResponseDto;
-
-  @ApiProperty()
-  updated_position: { id: number; quantity: number };
 }

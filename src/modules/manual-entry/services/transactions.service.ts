@@ -114,32 +114,7 @@ export class TransactionsService {
       ]);
       const txRow = txResult.rows[0];
 
-      // Determine quantity delta for position update
-      let quantityDelta = dto.quantity;
-      if (
-        ['sell', 'transfer_out', 'withdrawal'].includes(dto.transaction_type)
-      ) {
-        quantityDelta = -dto.quantity;
-      }
-
-      // Update position
-      const positionSql = `
-        INSERT INTO positions (asset_id, custodian_id, quantity, updated_at)
-        VALUES ($1, $2, $3, NOW())
-        ON CONFLICT (asset_id, custodian_id)
-        DO UPDATE SET
-          quantity = positions.quantity + $3,
-          updated_at = NOW()
-        RETURNING id, quantity
-      `;
-      const posResult = await client.query(positionSql, [
-        dto.asset_id,
-        dto.custodian_id,
-        quantityDelta,
-      ]);
-      const posRow = posResult.rows[0];
-
-      // Get asset symbol for response
+      // Get asset symbol and custodian name for response
       const assetResult = await client.query(
         'SELECT symbol FROM assets WHERE id = $1',
         [dto.asset_id],
@@ -173,10 +148,6 @@ export class TransactionsService {
             : undefined,
           transaction_date: txRow.transaction_date.toISOString().split('T')[0],
           notes: txRow.notes,
-        },
-        updated_position: {
-          id: posRow.id,
-          quantity: parseFloat(posRow.quantity),
         },
       };
     } catch (error) {

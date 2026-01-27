@@ -11,6 +11,7 @@ import type {
 // Query keys
 export const queryKeys = {
   portfolioSummary: ['portfolioSummary'] as const,
+  pnl: (params?: { asset_id?: number }) => ['pnl', params] as const,
   positions: (params?: { custodian_id?: number; asset_type_id?: number }) =>
     ['positions', params] as const,
   assets: (params?: { asset_type_id?: number; price_api_source?: string }) =>
@@ -31,6 +32,14 @@ export const usePortfolioSummary = () => {
     queryKey: queryKeys.portfolioSummary,
     queryFn: api.getPortfolioSummary,
     refetchInterval: 60000, // Refresh every minute
+  });
+};
+
+// Portfolio PnL
+export const usePnl = (params?: { asset_id?: number }) => {
+  return useQuery({
+    queryKey: queryKeys.pnl(params),
+    queryFn: () => api.getPnl(params),
   });
 };
 
@@ -140,10 +149,9 @@ export const useCreateTransaction = () => {
   return useMutation({
     mutationFn: (request: CreateTransactionRequest) => api.createTransaction(request),
     onSuccess: () => {
+      // Only invalidate transactions and PnL - transactions no longer modify positions
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['positions'] });
-      queryClient.invalidateQueries({ queryKey: queryKeys.portfolioSummary });
-      queryClient.invalidateQueries({ queryKey: queryKeys.custodians });
+      queryClient.invalidateQueries({ queryKey: ['pnl'] });
     },
   });
 };

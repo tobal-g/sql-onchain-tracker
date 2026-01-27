@@ -106,10 +106,6 @@ export interface CreateTransactionRequest {
 export interface CreateTransactionResponse {
   success: boolean;
   transaction: Transaction;
-  updated_position: {
-    id: number;
-    quantity: number;
-  };
 }
 
 // Portfolio Summary
@@ -137,6 +133,61 @@ export interface PortfolioSummary {
   by_custodian: CustodianBreakdown[];
   top_holdings: TopHolding[];
   last_updated: string;
+}
+
+// PnL Types
+export interface CostBasis {
+  total_cost_usd: number;
+  avg_cost_per_unit: number;
+  total_qty_bought: number;
+}
+
+export interface UnrealizedPnl {
+  amount_usd: number;
+  percent: number | null;
+}
+
+export interface RealizedPnl {
+  amount_usd: number;
+  total_qty_sold: number;
+  total_proceeds_usd: number;
+}
+
+export interface Performance {
+  apy: number | null;
+  holding_days: number | null;
+  first_buy_date: string | null;
+}
+
+export interface PnlPosition {
+  asset_id: number;
+  symbol: string;
+  asset_name: string;
+  asset_type: string;
+  current_quantity: number;
+  current_price_usd: number;
+  current_value_usd: number;
+  has_cost_basis: boolean;
+  cost_basis: CostBasis | null;
+  unrealized_pnl: UnrealizedPnl | null;
+  realized_pnl: RealizedPnl | null;
+  performance: Performance | null;
+}
+
+export interface PnlSummary {
+  total_cost_basis_usd: number;
+  total_current_value_usd: number;
+  total_unrealized_pnl_usd: number;
+  total_unrealized_pnl_percent: number | null;
+  total_realized_pnl_usd: number;
+  positions_with_cost_basis: number;
+  positions_without_cost_basis: number;
+}
+
+export interface PnlResponse {
+  summary: PnlSummary;
+  positions: PnlPosition[];
+  generated_at: string;
 }
 
 // API Responses

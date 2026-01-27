@@ -8,6 +8,7 @@ import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Positions from './pages/Positions';
 import Assets from './pages/Assets';
+import Transactions from './pages/Transactions';
 import Custodians from './pages/Custodians';
 import Login from './pages/Login';
 
@@ -40,6 +41,7 @@ function App() {
                   <Route index element={<Dashboard />} />
                   <Route path="positions" element={<Positions />} />
                   <Route path="assets" element={<Assets />} />
+                  <Route path="transactions" element={<Transactions />} />
                   <Route path="custodians" element={<Custodians />} />
                 </Route>
               </Routes>

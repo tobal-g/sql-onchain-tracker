@@ -11,6 +11,7 @@ import { TransactionsController } from './controllers/transactions.controller';
 import { TransactionsService } from './services/transactions.service';
 import { PortfolioSummaryController } from './controllers/portfolio-summary.controller';
 import { PortfolioSummaryService } from './services/portfolio-summary.service';
+import { PnlService } from './services/pnl.service';
 
 @Module({
   controllers: [
@@ -28,6 +29,7 @@ import { PortfolioSummaryService } from './services/portfolio-summary.service';
     AssetTypesService,
     TransactionsService,
     PortfolioSummaryService,
+    PnlService,
   ],
   exports: [
     PositionsService,

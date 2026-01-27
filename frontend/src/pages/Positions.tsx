@@ -13,11 +13,13 @@ import Tabs from '../components/common/Tabs';
 import { useToast } from '../components/common/Toast';
 import PositionsTable from '../components/positions/PositionsTable';
 import AssetSummaryView from '../components/positions/AssetSummaryView';
+import PnlView from '../components/positions/PnlView';
 import type { Position, UpsertPositionRequest } from '../types';
 
 const TABS = [
   { id: 'positions', label: 'By Position' },
   { id: 'assets', label: 'By Asset' },
+  { id: 'performance', label: 'Performance' },
 ];
 
 export default function Positions() {
@@ -116,7 +118,7 @@ export default function Positions() {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'positions' ? (
+      {activeTab === 'positions' && (
         <PositionsTable
           positions={positionsData?.positions ?? []}
           deleteConfirm={deleteConfirm}
@@ -126,12 +128,14 @@ export default function Positions() {
           onDeleteCancel={() => setDeleteConfirm(null)}
           isDeleting={deleteMutation.isPending}
         />
-      ) : (
+      )}
+      {activeTab === 'assets' && (
         <AssetSummaryView
           aggregatedAssets={aggregatedAssets}
           totalValue={positionsData?.total_value_usd ?? 0}
         />
       )}
+      {activeTab === 'performance' && <PnlView />}
 
       {/* Position Modal */}
       {isModalOpen && (
