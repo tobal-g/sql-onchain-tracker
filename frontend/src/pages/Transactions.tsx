@@ -124,7 +124,10 @@ export default function Transactions() {
       </div>
 
       {/* Transactions Grouped by Asset */}
-      <TransactionsGroupedView transactions={transactionsData?.transactions ?? []} />
+      <TransactionsGroupedView
+        transactions={transactionsData?.transactions ?? []}
+        assets={assetsData?.assets ?? []}
+      />
 
       {/* Transaction Modal */}
       {isModalOpen && (

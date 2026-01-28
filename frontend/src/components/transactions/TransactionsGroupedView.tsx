@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { formatCurrency, formatQuantity, formatDate } from '../../utils/format';
-import type { Transaction } from '../../types';
+import type { Transaction, Asset } from '../../types';
 
 const TRANSACTION_TYPE_STYLES: Record<string, { bg: string; text: string }> = {
   buy: { bg: 'bg-green-100', text: 'text-green-800' },
@@ -10,6 +10,29 @@ const TRANSACTION_TYPE_STYLES: Record<string, { bg: string; text: string }> = {
   deposit: { bg: 'bg-gray-100', text: 'text-gray-800' },
   withdrawal: { bg: 'bg-gray-100', text: 'text-gray-800' },
 };
+
+// Color mapping for asset types
+const ASSET_TYPE_COLORS: Record<string, string> = {
+  stablecoin: '#10B981',
+  crypto: '#F59E0B',
+  etf: '#3B82F6',
+  stock: '#8B5CF6',
+  bond: '#06B6D4',
+  cash: '#84CC16',
+};
+
+function getAssetTypeColor(type: string): string {
+  return ASSET_TYPE_COLORS[type.toLowerCase()] ?? '#6B7280';
+}
+
+function capitalizeAssetType(type: string): string {
+  // Handle special cases like "etf" -> "ETFs"
+  const lower = type.toLowerCase();
+  if (lower === 'etf') return 'ETFs';
+  if (lower === 'crypto') return 'Crypto';
+  // Default: capitalize first letter and add 's' for plural
+  return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase() + 's';
+}
 
 function formatTransactionType(type: string): string {
   return type.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -159,39 +182,93 @@ function CollapsibleAssetSection({
 // Main component
 interface TransactionsGroupedViewProps {
   transactions: Transaction[];
+  assets: Asset[];
 }
 
-export default function TransactionsGroupedView({ transactions }: TransactionsGroupedViewProps) {
-  // Group transactions by asset
-  const groupedTransactions = useMemo(() => {
+export default function TransactionsGroupedView({ transactions, assets }: TransactionsGroupedViewProps) {
+  // Create asset lookup map
+  const assetMap = useMemo(() => {
+    const map = new Map<number, Asset>();
+    for (const asset of assets) {
+      map.set(asset.id, asset);
+    }
+    return map;
+  }, [assets]);
+
+  // Group transactions by asset type, then by asset
+  const groupedByType = useMemo(() => {
     if (transactions.length === 0) return [];
 
-    const groups: Record<number, { symbol: string; assetName: string; transactions: Transaction[] }> = {};
+    // First, group by asset
+    const assetGroups: Record<
+      number,
+      { symbol: string; assetName: string; assetType: string; transactions: Transaction[] }
+    > = {};
 
     for (const tx of transactions) {
-      if (!groups[tx.asset_id]) {
-        groups[tx.asset_id] = {
+      const asset = assetMap.get(tx.asset_id);
+      if (!assetGroups[tx.asset_id]) {
+        assetGroups[tx.asset_id] = {
           symbol: tx.asset_symbol,
-          assetName: '', // We'll get this from the first transaction
+          assetName: asset?.name || '',
+          assetType: asset?.asset_type.name || 'Other',
           transactions: [],
         };
       }
-      groups[tx.asset_id].transactions.push(tx);
+      assetGroups[tx.asset_id].transactions.push(tx);
     }
 
-    // Sort by symbol alphabetically
-    return Object.entries(groups)
-      .map(([assetId, data]) => ({
-        assetId: Number(assetId),
-        symbol: data.symbol,
-        assetName: data.assetName,
-        transactions: data.transactions.sort(
-          (a, b) => new Date(b.transaction_date).getTime() - new Date(a.transaction_date).getTime()
-        ),
-        totalValue: data.transactions.reduce((sum, tx) => sum + (tx.total_value_usd ?? 0), 0),
+    // Convert to array and calculate totals
+    const assetsWithTotals = Object.entries(assetGroups).map(([assetId, data]) => ({
+      assetId: Number(assetId),
+      symbol: data.symbol,
+      assetName: data.assetName,
+      assetType: data.assetType,
+      transactions: data.transactions.sort(
+        (a, b) => new Date(b.transaction_date).getTime() - new Date(a.transaction_date).getTime()
+      ),
+      totalValue: data.transactions.reduce((sum, tx) => sum + (tx.total_value_usd ?? 0), 0),
+    }));
+
+    // Now group by asset type
+    const typeGroups: Record<
+      string,
+      {
+        assets: typeof assetsWithTotals;
+        totalValue: number;
+        totalTransactions: number;
+      }
+    > = {};
+
+    for (const asset of assetsWithTotals) {
+      const typeKey = asset.assetType;
+      if (!typeGroups[typeKey]) {
+        typeGroups[typeKey] = {
+          assets: [],
+          totalValue: 0,
+          totalTransactions: 0,
+        };
+      }
+      typeGroups[typeKey].assets.push(asset);
+      typeGroups[typeKey].totalValue += asset.totalValue;
+      typeGroups[typeKey].totalTransactions += asset.transactions.length;
+    }
+
+    // Sort assets within each type by symbol
+    for (const typeGroup of Object.values(typeGroups)) {
+      typeGroup.assets.sort((a, b) => a.symbol.localeCompare(b.symbol));
+    }
+
+    // Convert to array and sort types by total value
+    return Object.entries(typeGroups)
+      .map(([typeName, data]) => ({
+        typeName,
+        assets: data.assets,
+        totalValue: data.totalValue,
+        totalTransactions: data.totalTransactions,
       }))
-      .sort((a, b) => a.symbol.localeCompare(b.symbol));
-  }, [transactions]);
+      .sort((a, b) => b.totalValue - a.totalValue);
+  }, [transactions, assetMap]);
 
   // Track expanded sections - all start collapsed
   const [expandedSections, setExpandedSections] = useState<Set<number>>(() => new Set());
@@ -235,17 +312,41 @@ export default function TransactionsGroupedView({ transactions }: TransactionsGr
   }
 
   return (
-    <div className="space-y-4">
-      {groupedTransactions.map(({ assetId, symbol, assetName, transactions, totalValue }) => (
-        <CollapsibleAssetSection
-          key={assetId}
-          symbol={symbol}
-          assetName={assetName}
-          transactions={transactions}
-          totalValue={totalValue}
-          isExpanded={expandedSections.has(assetId)}
-          onToggle={() => toggleSection(assetId)}
-        />
+    <div className="space-y-8">
+      {groupedByType.map(({ typeName, assets, totalValue, totalTransactions }) => (
+        <div key={typeName} className="space-y-4">
+          {/* Type Header */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <div className="flex items-center gap-3 px-3">
+              <h3 className="text-sm font-bold tracking-wider text-gray-700">
+                {capitalizeAssetType(typeName)}
+              </h3>
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                {totalTransactions} transactions
+              </span>
+              <span className="text-sm font-semibold text-gray-900">
+                {totalValue > 0 ? formatCurrency(totalValue) : '-'}
+              </span>
+            </div>
+            <div className="flex-1 border-t border-gray-300"></div>
+          </div>
+
+          {/* Assets in this type */}
+          <div className="space-y-4">
+            {assets.map(({ assetId, symbol, assetName, transactions, totalValue }) => (
+              <CollapsibleAssetSection
+                key={assetId}
+                symbol={symbol}
+                assetName={assetName}
+                transactions={transactions}
+                totalValue={totalValue}
+                isExpanded={expandedSections.has(assetId)}
+                onToggle={() => toggleSection(assetId)}
+              />
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );
