@@ -7,7 +7,7 @@ import {
 } from '../hooks/usePortfolio';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useToast } from '../components/common/Toast';
-import TransactionsTable from '../components/transactions/TransactionsTable';
+import TransactionsGroupedView from '../components/transactions/TransactionsGroupedView';
 import TransactionModal from '../components/transactions/TransactionModal';
 import type { CreateTransactionRequest } from '../types';
 
@@ -123,8 +123,8 @@ export default function Transactions() {
         </div>
       </div>
 
-      {/* Transactions Table */}
-      <TransactionsTable transactions={transactionsData?.transactions ?? []} />
+      {/* Transactions Grouped by Asset */}
+      <TransactionsGroupedView transactions={transactionsData?.transactions ?? []} />
 
       {/* Transaction Modal */}
       {isModalOpen && (

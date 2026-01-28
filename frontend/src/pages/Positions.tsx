@@ -11,15 +11,13 @@ import { aggregatePositionsByAsset } from '../utils/aggregation';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Tabs from '../components/common/Tabs';
 import { useToast } from '../components/common/Toast';
-import PositionsTable from '../components/positions/PositionsTable';
+import PositionsGroupedView from '../components/positions/PositionsGroupedView';
 import AssetSummaryView from '../components/positions/AssetSummaryView';
-import PnlView from '../components/positions/PnlView';
 import type { Position, UpsertPositionRequest } from '../types';
 
 const TABS = [
   { id: 'positions', label: 'By Position' },
   { id: 'assets', label: 'By Asset' },
-  { id: 'performance', label: 'Performance' },
 ];
 
 export default function Positions() {
@@ -119,7 +117,7 @@ export default function Positions() {
 
       {/* Tab Content */}
       {activeTab === 'positions' && (
-        <PositionsTable
+        <PositionsGroupedView
           positions={positionsData?.positions ?? []}
           deleteConfirm={deleteConfirm}
           onEdit={handleEdit}
@@ -135,7 +133,6 @@ export default function Positions() {
           totalValue={positionsData?.total_value_usd ?? 0}
         />
       )}
-      {activeTab === 'performance' && <PnlView />}
 
       {/* Position Modal */}
       {isModalOpen && (

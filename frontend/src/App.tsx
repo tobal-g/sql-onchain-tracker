@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
+import Performance from './pages/Performance';
 import Positions from './pages/Positions';
 import Assets from './pages/Assets';
 import Transactions from './pages/Transactions';
@@ -39,6 +40,7 @@ function App() {
                   }
                 >
                   <Route index element={<Dashboard />} />
+                  <Route path="performance" element={<Performance />} />
                   <Route path="positions" element={<Positions />} />
                   <Route path="assets" element={<Assets />} />
                   <Route path="transactions" element={<Transactions />} />
